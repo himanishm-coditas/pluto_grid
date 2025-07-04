@@ -53,21 +53,33 @@ class PlutoRightFrozenRowsState
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      controller: _scroll,
-      scrollDirection: Axis.vertical,
-      physics: const ClampingScrollPhysics(),
-      itemCount: _rows.length,
-      itemExtent: stateManager.rowTotalHeight,
-      itemBuilder: (ctx, i) {
-        return PlutoBaseRow(
-          key: ValueKey('right_frozen_row_${_rows[i].key}'),
-          rowIdx: i,
-          row: _rows[i],
-          columns: _columns,
-          stateManager: stateManager,
-        );
-      },
+    return DecoratedBox(///Responsible for adding shadow for frozen rows
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 8,
+            spreadRadius: 1,
+            offset: const Offset(-1, 0),
+          ),
+        ],
+      ),
+      child: ListView.builder(
+        controller: _scroll,
+        scrollDirection: Axis.vertical,
+        physics: const ClampingScrollPhysics(),
+        itemCount: _rows.length,
+        itemExtent: stateManager.rowTotalHeight,
+        itemBuilder: (ctx, i) {
+          return PlutoBaseRow(
+            key: ValueKey('right_frozen_row_${_rows[i].key}'),
+            rowIdx: i,
+            row: _rows[i],
+            columns: _columns,
+            stateManager: stateManager,
+          );
+        },
+      ),
     );
   }
 }
