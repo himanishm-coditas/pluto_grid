@@ -8,6 +8,8 @@
 .buildlog/
 .history
 .svn/
+# Flutter generated ephemeral files
+**/ephemeral/
 
 # IntelliJ related
 *.iml
