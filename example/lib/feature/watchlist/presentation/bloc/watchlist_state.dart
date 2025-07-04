@@ -10,8 +10,6 @@ sealed  class WatchlistState extends Equatable {
 
 class WatchlistInitial extends WatchlistState {}
 
-class WatchlistLoading extends WatchlistState {}
-
 class WatchlistLoaded extends WatchlistState {
   final List<WatchlistItem> items;
 

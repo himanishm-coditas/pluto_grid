@@ -8,11 +8,6 @@ class WatchlistUsecase {
 
   WatchlistUsecase(this.repository);
 
-  Future<Either<Failure, List<WatchlistItem>>> getWatchlistItems() async {
-    try {
-      return await repository.getWatchlistItems();
-    } catch (e) {
-      return Left(CacheFailure('Unexpected error in usecase: ${e.toString()}'));
-    }
-  }
+  Future<Either<Failure, List<WatchlistItem>>> getWatchlistItems() =>
+      repository.getWatchlistItems();
 }

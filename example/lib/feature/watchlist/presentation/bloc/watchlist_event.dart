@@ -12,6 +12,3 @@ class LoadWatchlistEvent extends WatchlistEvent {
   const LoadWatchlistEvent();
 }
 
-class RefreshWatchlistEvent extends WatchlistEvent {
-  const RefreshWatchlistEvent();
-}

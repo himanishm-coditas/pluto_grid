@@ -22,7 +22,7 @@ class WatchlistPage extends StatelessWidget {
               icon: const Icon(Icons.refresh),
               onPressed: () => context
                   .read<WatchlistBloc>()
-                  .add(const RefreshWatchlistEvent()),
+                  .add(const LoadWatchlistEvent()),
               tooltip: AppStrings.refreshTooltip,
             ),
           ],
@@ -41,7 +41,7 @@ class _WatchlistBody extends StatelessWidget {
     return BlocBuilder<WatchlistBloc, WatchlistState>(
       builder: (context, state) {
         return switch (state) {
-          WatchlistLoading() ||  WatchlistInitial() => const Center(child: CircularProgressIndicator()),
+          WatchlistInitial() => const Center(child: CircularProgressIndicator()),
           WatchlistError(message: final message) => Center(
             child: Column(
               spacing: 16,

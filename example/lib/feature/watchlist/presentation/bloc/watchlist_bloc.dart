@@ -12,14 +12,13 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
 
   WatchlistBloc({required this.watchlistUsecase}) : super(WatchlistInitial()) {
     on<LoadWatchlistEvent>(_onLoadWatchlist);
-    on<RefreshWatchlistEvent>(_onRefreshWatchlist);
   }
 
   Future<void> _onLoadWatchlist(
       LoadWatchlistEvent event,
       Emitter<WatchlistState> emit,
       ) async {
-    emit(WatchlistLoading());
+    emit(WatchlistInitial());
     final result = await watchlistUsecase.getWatchlistItems();
     result.fold(
           (failure) => emit(WatchlistError(_mapFailureToMessage(failure))),
@@ -27,17 +26,6 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
     );
   }
 
-  Future<void> _onRefreshWatchlist(
-      RefreshWatchlistEvent event,
-      Emitter<WatchlistState> emit,
-      ) async {
-    emit(WatchlistLoading());
-    final result = await watchlistUsecase.getWatchlistItems();
-    result.fold(
-          (failure) => emit(WatchlistError(_mapFailureToMessage(failure))),
-          (items) => emit(WatchlistLoaded(items)),
-    );
-  }
 
   String _mapFailureToMessage(Failure failure) {
     return failure.message;

@@ -11,14 +11,10 @@ class WatchlistRepositoryImpl implements WatchlistRepository {
 
   @override
   Future<Either<Failure, List<WatchlistItem>>> getWatchlistItems() async {
-    try {
-      final result = await localDataSource.getWatchlistItems();
-      return result.fold(
-            (failure) => Left(failure),
-            (models) => Right(models),
-      );
-    } catch (e) {
-      return Left(CacheFailure('Unexpected error: ${e.toString()}'));
-    }
+    final result = await localDataSource.getWatchlistItems();
+    return result.fold(
+      (failure) => Left(failure),
+      (models) => Right(models),
+    );
   }
 }
