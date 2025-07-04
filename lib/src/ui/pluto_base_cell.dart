@@ -13,10 +13,6 @@ class PlutoBaseCell extends StatelessWidget
 
   final PlutoRow row;
 
-
-
-  ///snrfnienr
-
   final PlutoGridStateManager stateManager;
 
   const PlutoBaseCell({
