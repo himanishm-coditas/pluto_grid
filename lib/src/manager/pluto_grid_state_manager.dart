@@ -258,12 +258,12 @@ class PlutoGridStateManager extends PlutoGridStateChangeNotifier {
   ///
   /// {@macro initialize_rows_sync_or_async}
   static List<PlutoRow> initializeRows(
-    List<PlutoColumn> refColumns,
-    List<PlutoRow> refRows, {
-    bool forceApplySortIdx = true,
-    bool increase = true,
-    int start = 0,
-  }) {
+      List<PlutoColumn> refColumns,
+      List<PlutoRow> refRows, {
+        bool forceApplySortIdx = true,
+        bool increase = true,
+        int start = 0,
+      }) {
     if (refColumns.isEmpty || refRows.isEmpty) {
       return refRows;
     }
@@ -319,14 +319,14 @@ class PlutoGridStateManager extends PlutoGridStateChangeNotifier {
   ///
   /// {@macro initialize_rows_sync_or_async}
   static Future<List<PlutoRow>> initializeRowsAsync(
-    List<PlutoColumn> refColumns,
-    List<PlutoRow> refRows, {
-    bool forceApplySortIdx = true,
-    bool increase = true,
-    int start = 0,
-    int chunkSize = 100,
-    Duration duration = const Duration(milliseconds: 1),
-  }) {
+      List<PlutoColumn> refColumns,
+      List<PlutoRow> refRows, {
+        bool forceApplySortIdx = true,
+        bool increase = true,
+        int start = 0,
+        int chunkSize = 100,
+        Duration duration = const Duration(milliseconds: 1),
+      }) {
     if (refColumns.isEmpty || refRows.isEmpty) {
       return Future.value(refRows);
     }
@@ -343,7 +343,7 @@ class PlutoGridStateManager extends PlutoGridStateChangeNotifier {
 
     final List<int> chunksIndexes = List.generate(
       chunksLength,
-      (index) => index,
+          (index) => index,
     );
 
     Timer.periodic(duration, (timer) {
@@ -378,6 +378,24 @@ class PlutoGridStateManager extends PlutoGridStateChangeNotifier {
 
     return completer.future;
   }
+  PlutoRow? _hoveredRow;
+
+  void setHoveredRow(PlutoRow row) {
+    if (_hoveredRow != row) {
+      _hoveredRow = row;
+      notifyListeners();
+    }
+  }
+
+
+  void clearHoveredRow() {
+    if (_hoveredRow != null) {
+      _hoveredRow = null;
+      notifyListeners();
+    }
+  }
+
+  bool isRowHovered(PlutoRow row) => _hoveredRow == row;
 }
 
 /// This is a class for handling horizontal and vertical scrolling of columns and rows of [PlutoGrid].

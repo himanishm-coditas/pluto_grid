@@ -26,9 +26,9 @@ class PlutoBaseRow extends StatelessWidget {
 
   bool _checkSameDragRows(PlutoRow draggingRow) {
     final List<PlutoRow> selectedRows =
-        stateManager.currentSelectingRows.isNotEmpty
-            ? stateManager.currentSelectingRows
-            : [draggingRow];
+    stateManager.currentSelectingRows.isNotEmpty
+        ? stateManager.currentSelectingRows
+        : [draggingRow];
 
     final end = rowIdx + selectedRows.length;
 
@@ -58,7 +58,8 @@ class PlutoBaseRow extends StatelessWidget {
     );
   }
 
-  PlutoVisibilityLayoutId _makeCell(PlutoColumn column) {
+
+  PlutoVisibilityLayoutId _makeCell(PlutoColumn column,) {
     return PlutoVisibilityLayoutId(
       id: column.field,
       child: PlutoBaseCell(
@@ -72,45 +73,70 @@ class PlutoBaseRow extends StatelessWidget {
     );
   }
 
-  Widget _dragTargetBuilder(dragContext, candidate, rejected) {
-    return _RowContainerWidget(
-      stateManager: stateManager,
-      rowIdx: rowIdx,
-      row: row,
-      enableRowColorAnimation:
-          stateManager.configuration.style.enableRowColorAnimation,
-      key: ValueKey('rowContainer_${row.key}'),
-      child: visibilityLayout
-          ? PlutoVisibilityLayout(
-              key: ValueKey('rowContainer_${row.key}_row'),
-              delegate: _RowCellsLayoutDelegate(
-                stateManager: stateManager,
-                columns: columns,
-                textDirection: stateManager.textDirection,
-              ),
-              scrollController: stateManager.scroll.bodyRowsHorizontal!,
-              initialViewportDimension: MediaQuery.of(dragContext).size.width,
-              children: columns.map(_makeCell).toList(growable: false),
-            )
-          : CustomMultiChildLayout(
-              key: ValueKey('rowContainer_${row.key}_row'),
-              delegate: _RowCellsLayoutDelegate(
-                stateManager: stateManager,
-                columns: columns,
-                textDirection: stateManager.textDirection,
-              ),
-              children: columns.map(_makeCell).toList(growable: false),
-            ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return DragTarget<PlutoRow>(
+    final dragTarget = DragTarget<PlutoRow>(
       onWillAcceptWithDetails: _handleOnWillAccept,
       onAcceptWithDetails: _handleOnAccept,
-      builder: _dragTargetBuilder,
+      onMove: (details) {
+        final offset = details.offset;
+        final renderBox = context.findRenderObject() as RenderBox;
+        final localPosition = renderBox.globalToLocal(offset);
+        final isTopHalf = localPosition.dy < renderBox.size.height / 2;
+
+        stateManager.setDragTargetRowIdx(
+          rowIdx,
+          isTopHalf: isTopHalf,
+        );
+      },
+      onLeave: (data) {
+        stateManager.setDragTargetRowIdx(null);
+      },
+      builder: (context, candidateData, rejectedData) {
+
+
+
+        return _RowContainerWidget(
+          stateManager: stateManager,
+          rowIdx: rowIdx,
+          row: row,
+          enableRowColorAnimation:
+          stateManager.configuration.style.enableRowColorAnimation,
+          key: ValueKey('rowContainer_${row.key}'),
+          child: visibilityLayout
+              ? PlutoVisibilityLayout(
+            key: ValueKey('rowContainer_${row.key}_row'),
+            delegate: _RowCellsLayoutDelegate(
+              stateManager: stateManager,
+              columns: columns,
+              textDirection: stateManager.textDirection,
+            ),
+            scrollController: stateManager.scroll.bodyRowsHorizontal!,
+            initialViewportDimension: MediaQuery.of(context).size.width,
+            children: columns.map((column) {
+              return _makeCell(
+                column,
+              );
+            }).toList(growable: false),
+          )
+              : CustomMultiChildLayout(
+            key: ValueKey('rowContainer_${row.key}_row'),
+            delegate: _RowCellsLayoutDelegate(
+              stateManager: stateManager,
+              columns: columns,
+              textDirection: stateManager.textDirection,
+            ),
+            children: columns.map((column) {
+              return _makeCell(
+                column,
+              );
+            }).toList(growable: false),
+          ),
+        );
+      },
     );
+
+    return dragTarget;
   }
 }
 
@@ -131,7 +157,7 @@ class _RowCellsLayoutDelegate extends MultiChildLayoutDelegate {
   Size getSize(BoxConstraints constraints) {
     final double width = columns.fold(
       0,
-      (previousValue, element) => previousValue + element.width,
+          (previousValue, element) => previousValue + element.width,
     );
 
     return Size(width, stateManager.rowHeight);
@@ -269,6 +295,14 @@ class _RowContainerWidgetState extends PlutoStateWithChange<_RowContainerWidget>
       }
     }
 
+    if (stateManager.isRowHovered(widget.row) &&
+        stateManager.configuration.enableRowHoverColor) {
+      color = Color.alphaBlend(
+        stateManager.configuration.style.rowHoverColor,
+        color,
+      );
+    }
+
     return isCheckedRow
         ? Color.alphaBlend(stateManager.configuration.style.checkedColor, color)
         : color;
@@ -276,30 +310,21 @@ class _RowContainerWidgetState extends PlutoStateWithChange<_RowContainerWidget>
 
   BoxDecoration _getBoxDecoration() {
     final bool isCurrentRow = stateManager.currentRowIdx == widget.rowIdx;
-
     final bool isSelecting = stateManager.isSelecting;
-
     final bool isCheckedRow = widget.row.checked == true;
-
     final alreadyTarget = stateManager.dragRows
-            .firstWhereOrNull((element) => element.key == widget.row.key) !=
+        .firstWhereOrNull((element) => element.key == widget.row.key) !=
         null;
-
     final isDraggingRow = stateManager.isDraggingRow;
-
     final bool isDragTarget = isDraggingRow &&
         !alreadyTarget &&
         stateManager.isRowIdxDragTarget(widget.rowIdx);
-
     final bool isTopDragTarget =
         isDraggingRow && stateManager.isRowIdxTopDragTarget(widget.rowIdx);
-
     final bool isBottomDragTarget =
         isDraggingRow && stateManager.isRowIdxBottomDragTarget(widget.rowIdx);
-
     final bool hasCurrentSelectingPosition =
         stateManager.hasCurrentSelectingPosition;
-
     final bool isFocusedCurrentRow = isCurrentRow && stateManager.hasFocus;
 
     final Color rowColor = _getRowColor(
@@ -310,26 +335,54 @@ class _RowContainerWidgetState extends PlutoStateWithChange<_RowContainerWidget>
       isCheckedRow: isCheckedRow,
     );
 
+    final bool isSelectedRow = stateManager.selectingMode.isRow &&
+        stateManager.isSelectedRow(widget.row.key);
+    final bool showSelectedBorder = stateManager
+        .configuration.style.enableSelectedRowBorder &&
+        (isSelectedRow || (isCurrentRow && !stateManager.selectingMode.isRow));
+
+    BorderSide topBorder = showSelectedBorder
+        ? BorderSide(
+      width: PlutoGridSettings.rowBorderWidth,
+      color: stateManager.configuration.style.selectedRowBorderColor,
+    )
+        : BorderSide.none;
+
+    BorderSide bottomBorder = stateManager
+        .configuration.style.enableCellBorderHorizontal
+        ? BorderSide(
+      width: PlutoGridSettings.rowBorderWidth,
+      color: showSelectedBorder
+          ? stateManager.configuration.style.selectedRowBorderColor
+          : stateManager.configuration.style.borderColor,
+    )
+        : showSelectedBorder
+        ? BorderSide(
+      width: PlutoGridSettings.rowBorderWidth,
+      color: stateManager.configuration.style.selectedRowBorderColor,
+    )
+        : BorderSide.none;
+
+    if (isDragTarget) {
+      if (isTopDragTarget) {
+        topBorder = BorderSide(
+          width: stateManager.configuration.style.dragTargetIndicatorThickness,
+          color: stateManager.configuration.style.dragTargetIndicatorColor,
+        );
+      }
+      if (isBottomDragTarget) {
+        bottomBorder = BorderSide(
+          width: stateManager.configuration.style.dragTargetIndicatorThickness,
+          color: stateManager.configuration.style.dragTargetIndicatorColor,
+        );
+      }
+    }
+
     return BoxDecoration(
       color: rowColor,
       border: Border(
-        top: isTopDragTarget
-            ? BorderSide(
-                width: PlutoGridSettings.rowBorderWidth,
-                color: stateManager.configuration.style.activatedBorderColor,
-              )
-            : BorderSide.none,
-        bottom: isBottomDragTarget
-            ? BorderSide(
-                width: PlutoGridSettings.rowBorderWidth,
-                color: stateManager.configuration.style.activatedBorderColor,
-              )
-            : stateManager.configuration.style.enableCellBorderHorizontal
-                ? BorderSide(
-                    width: PlutoGridSettings.rowBorderWidth,
-                    color: stateManager.configuration.style.borderColor,
-                  )
-                : BorderSide.none,
+        top: topBorder,
+        bottom: bottomBorder,
       ),
     );
   }
@@ -338,10 +391,22 @@ class _RowContainerWidgetState extends PlutoStateWithChange<_RowContainerWidget>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return _AnimatedOrNormalContainer(
-      enable: widget.enableRowColorAnimation,
-      decoration: _decoration,
-      child: widget.child,
+    return MouseRegion(
+      onEnter: (_) {
+        if (widget.stateManager.configuration.enableRowHoverColor) {
+          widget.stateManager.setHoveredRow(widget.row);
+        }
+      },
+      onExit: (_) {
+        if (widget.stateManager.configuration.enableRowHoverColor) {
+          widget.stateManager.clearHoveredRow();
+        }
+      },
+      child: _AnimatedOrNormalContainer(
+        enable: widget.enableRowColorAnimation,
+        decoration: _getBoxDecoration(),
+        child: widget.child,
+      ),
     );
   }
 }
@@ -363,10 +428,10 @@ class _AnimatedOrNormalContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return enable
         ? AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            decoration: decoration,
-            child: child,
-          )
+      duration: const Duration(milliseconds: 300),
+      decoration: decoration,
+      child: child,
+    )
         : DecoratedBox(decoration: decoration, child: child);
   }
 }

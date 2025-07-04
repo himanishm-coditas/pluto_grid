@@ -78,3 +78,56 @@ coverage/
 
 # FVM Support - https://fvm.app/
 .fvm/flutter_sdk
+
+# Flutter & Dart
+.melosearch-lock.json
+
+# Build outputs
+ios/Flutter/
+macos/Flutter/
+linux/flutter/
+windows/flutter/
+web/
+
+# IDE configs
+.vscode/
+
+# Generated platforms and test (if not required)
+example/macos/
+example/linux/
+example/windows/
+example/test/
+example/android/
+example/ios/
+example/web/
+# Lock file for libraries
+example/pubspec.lock
+
+
+# Flutter example builds
+example/build/
+example/.dart_tool/
+
+
+
+# Other
+*.lock
+# Add these to your existing .gitignore
+.metadata
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+/android/
+/ios/
+/linux/
+/macos/
+/windows/
+/build/
+# ignore everything in example/
+example/*
+
+# but do NOT ignore lib folder and main.dart
+!example/lib/
+# GitHub workflows & configs
+.github/
