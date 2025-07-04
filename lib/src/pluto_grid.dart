@@ -661,14 +661,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
                   LayoutId(
                       id: _StackName.leftFrozenRows,
                       child: PlutoLeftFrozenRows(_stateManager)),
-                  LayoutId(
-                    id: _StackName.leftFrozenDivider,
-                    child: PlutoShadowLine(
-                      axis: Axis.vertical,
-                      color: style.gridBorderColor,
-                      shadow: style.enableGridBorderShadow,
-                    ),
-                  ),
+                  ///Remove Layout Id of Left Frozen divider
                   if (showColumnFooter)
                     LayoutId(
                       id: _StackName.leftFrozenColumnFooters,
@@ -685,15 +678,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
                   LayoutId(
                       id: _StackName.rightFrozenRows,
                       child: PlutoRightFrozenRows(_stateManager)),
-                  LayoutId(
-                    id: _StackName.rightFrozenDivider,
-                    child: PlutoShadowLine(
-                      axis: Axis.vertical,
-                      color: style.gridBorderColor,
-                      shadow: style.enableGridBorderShadow,
-                      reverse: true,
-                    ),
-                  ),
+                 ///Remove Layout Id of Right Frozen divider
                   if (showColumnFooter)
                     LayoutId(
                       id: _StackName.rightFrozenColumnFooters,
@@ -868,6 +853,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     // now layout columns of frozen sides and see what remains for the body width
+    // For left frozen columns
     if (hasChild(_StackName.leftFrozenColumns)) {
       var s = layoutChild(
         _StackName.leftFrozenColumns,
@@ -888,33 +874,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
       }
     }
 
-    if (hasChild(_StackName.leftFrozenDivider)) {
-      var s = layoutChild(
-        _StackName.leftFrozenDivider,
-        BoxConstraints.tight(
-          Size(
-            PlutoGridSettings.gridBorderWidth,
-            _safe(size.height - columnsTopOffset - bodyRowsBottomOffset),
-          ),
-        ),
-      );
-
-      final double posX = isLTR
-          ? bodyLeftOffset
-          : size.width - bodyRightOffset - PlutoGridSettings.gridBorderWidth;
-
-      positionChild(
-        _StackName.leftFrozenDivider,
-        Offset(posX, columnsTopOffset),
-      );
-
-      if (isLTR) {
-        bodyLeftOffset += s.width;
-      } else {
-        bodyRightOffset += s.width;
-      }
-    }
-
+// For right frozen columns
     if (hasChild(_StackName.rightFrozenColumns)) {
       var s = layoutChild(
         _StackName.rightFrozenColumns,
@@ -922,7 +882,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
       );
 
       final double posX =
-          isLTR ? size.width - s.width + PlutoGridSettings.gridBorderWidth : 0;
+      isLTR ? size.width - s.width : 0;
 
       positionChild(
         _StackName.rightFrozenColumns,
@@ -935,33 +895,8 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
         bodyLeftOffset = s.width;
       }
     }
+    //Removed Right frozen divider
 
-    if (hasChild(_StackName.rightFrozenDivider)) {
-      var s = layoutChild(
-        _StackName.rightFrozenDivider,
-        BoxConstraints.tight(
-          Size(
-            PlutoGridSettings.gridBorderWidth,
-            _safe(size.height - columnsTopOffset - bodyRowsBottomOffset),
-          ),
-        ),
-      );
-
-      final double posX = isLTR
-          ? size.width - bodyRightOffset - PlutoGridSettings.gridBorderWidth
-          : bodyLeftOffset;
-
-      positionChild(
-        _StackName.rightFrozenDivider,
-        Offset(posX, columnsTopOffset),
-      );
-
-      if (isLTR) {
-        bodyRightOffset += s.width;
-      } else {
-        bodyLeftOffset += s.width;
-      }
-    }
 
     if (hasChild(_StackName.bodyColumns)) {
       var s = layoutChild(
@@ -1703,14 +1638,12 @@ enum _StackName {
   leftFrozenColumns,
   leftFrozenColumnFooters,
   leftFrozenRows,
-  leftFrozenDivider,
   bodyColumns,
   bodyColumnFooters,
   bodyRows,
   rightFrozenColumns,
   rightFrozenColumnFooters,
   rightFrozenRows,
-  rightFrozenDivider,
   columnRowDivider,
   columnFooterDivider,
   footer,

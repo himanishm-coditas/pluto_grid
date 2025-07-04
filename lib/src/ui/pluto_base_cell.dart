@@ -262,30 +262,14 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
           cellColorInEditState: cellColorInEditState,
           selectingMode: selectingMode,
         ),
-        border: Border.all(
-          color: hasFocus ? activatedBorderColor : inactivatedBorderColor,
-          width: 1,
-        ),
       );
     } else if (isSelectedCell) {
       return BoxDecoration(
         color: activatedColor,
-        border: Border.all(
-          color: hasFocus ? activatedBorderColor : inactivatedBorderColor,
-          width: 1,
-        ),
       );
     } else {
       return BoxDecoration(
         color: isGroupedRowCell ? cellColorGroupedRow : null,
-        border: enableCellVerticalBorder
-            ? BorderDirectional(
-                end: BorderSide(
-                  color: borderColor,
-                  width: 1.0,
-                ),
-              )
-            : null,
       );
     }
   }
