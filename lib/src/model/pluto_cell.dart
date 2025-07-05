@@ -4,13 +4,16 @@ import 'package:pluto_grid/pluto_grid.dart';
 class PlutoCell {
   PlutoCell({
     dynamic value,
+    Widget? widget,
     Key? key,
   })  : _key = key ?? UniqueKey(),
-        _value = value;
+        _value = value,
+        _widget = widget;
 
   final Key _key;
 
   dynamic _value;
+  Widget? _widget;
 
   dynamic _valueForSorting;
 
@@ -61,6 +64,14 @@ class PlutoCell {
 
     _valueForSorting = null;
   }
+  Widget? get widget => _widget;
+
+  set widget(Widget? changed) {
+    if (_widget == changed) {
+      return;
+    }
+    _widget = changed;
+  }
 
   dynamic get valueForSorting {
     _valueForSorting ??= _getValueForSorting();
@@ -104,11 +115,11 @@ class PlutoCell {
 
 _assertUnInitializedCell(bool flag) {
   assert(
-    flag,
-    'PlutoCell is not initialized.'
-    'When adding a column or row, if it is not added through PlutoGridStateManager, '
-    'PlutoCell does not set the necessary information at runtime.'
-    'If you add a column or row through PlutoGridStateManager and this error occurs, '
-    'please contact Github issue.',
+  flag,
+  'PlutoCell is not initialized.'
+      'When adding a column or row, if it is not added through PlutoGridStateManager, '
+      'PlutoCell does not set the necessary information at runtime.'
+      'If you add a column or row through PlutoGridStateManager and this error occurs, '
+      'please contact Github issue.',
   );
 }
