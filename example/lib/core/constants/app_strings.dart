@@ -18,4 +18,6 @@ class AppStrings {
   static const String low52w = '52W Low';
   static const String ltp = 'LTP';
   static const String change = 'Change';
+  static const String edit = 'Edit';
+  static const String delete = 'Delete';
 }

@@ -14,6 +14,7 @@ class PlutoBaseCell extends StatelessWidget
   final PlutoRow row;
 
   final PlutoGridStateManager stateManager;
+  final bool showMenu;
 
   const PlutoBaseCell({
     super.key,
@@ -22,6 +23,7 @@ class PlutoBaseCell extends StatelessWidget
     required this.rowIdx,
     required this.row,
     required this.stateManager,
+    this.showMenu = false,
   });
 
   @override
@@ -105,7 +107,7 @@ class PlutoBaseCell extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final cellContent = GestureDetector(
       behavior: HitTestBehavior.translucent,
       // Essential gestures.
       onTapUp: _handleOnTapUp,
@@ -129,8 +131,146 @@ class PlutoBaseCell extends StatelessWidget
           column: column,
           row: row,
           cell: cell,
+          showMenu: showMenu,
         ),
       ),
+    );
+
+    if (showMenu && row.hasMenu) {
+      return _RowMenuWrapper(
+        row: row,
+        stateManager: stateManager,
+        dragTarget: cellContent,
+        menuOffset: Offset(
+          column.width * 0.8,
+          -stateManager.rowHeight * 0.94,
+        ),
+        menuChildren: row.menuChildren,
+        menuOptions: row.menuOptions,
+      );
+    }
+
+    return cellContent;
+  }
+}
+
+class _RowMenuWrapper extends StatefulWidget {
+  final PlutoRow row;
+  final PlutoGridStateManager stateManager;
+  final Widget dragTarget;
+  final Offset menuOffset;
+  final List<Widget>? menuChildren;
+  final List<Widget>? menuOptions;
+
+  const _RowMenuWrapper({
+    required this.row,
+    required this.stateManager,
+    required this.dragTarget,
+    required this.menuOffset,
+    this.menuChildren,
+    this.menuOptions,
+  });
+
+  @override
+  State<_RowMenuWrapper> createState() => _RowMenuWrapperState();
+}
+
+class _RowMenuWrapperState extends State<_RowMenuWrapper> {
+  final _menuController = MenuController();
+  final _optionsMenuController = MenuController();
+  bool _isHovered = false;
+  bool _isInteractingWithMenu = false;
+
+  @override
+  void dispose() {
+    _menuController.close();
+    _optionsMenuController.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isHovered = widget.stateManager.isRowHovered(widget.row);
+
+    if (isHovered != _isHovered) {
+      _isHovered = isHovered;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!_isHovered) {
+          // Close both menus when not hovered, regardless of interaction state
+          _optionsMenuController.close();
+          _menuController.close();
+          _isInteractingWithMenu = false;
+        } else {
+          // Open main menu when hovered
+          _menuController.open();
+        }
+      });
+    }
+
+    return MenuAnchor(
+      controller: _menuController,
+      alignmentOffset: widget.menuOffset,
+      menuChildren: [
+        MouseRegion(
+          onEnter: (_) {
+            widget.stateManager.setHoveredRow(widget.row);
+            if (!_isInteractingWithMenu) {
+              _menuController.open();
+            }
+          },
+          onExit: (_) {
+            if (!_isInteractingWithMenu) {
+              widget.stateManager.clearHoveredRow();
+            }
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.menuChildren?.isNotEmpty ?? false)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: widget.menuChildren!.map(
+                        (menuItem) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: menuItem,
+                    ),
+                  ).toList(),
+                ),
+              if (widget.menuOptions?.isNotEmpty ?? false)
+                MenuAnchor(
+                  controller: _optionsMenuController,
+                  crossAxisUnconstrained: false,
+                  onOpen: () {
+                    _isInteractingWithMenu = true;
+                    _menuController.open();
+                  },
+                  onClose: () {
+                    _isInteractingWithMenu = false;
+                    // Only close main menu if not hovered
+                    if (!_isHovered) {
+                      _menuController.close();
+                    }
+                  },
+                  menuChildren: widget.menuOptions!,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {
+                        if (_optionsMenuController.isOpen) {
+                          _optionsMenuController.close();
+                        } else {
+                          _optionsMenuController.open();
+                        }
+                      },
+                      child: const Icon(Icons.more_vert),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+      child: widget.dragTarget,
     );
   }
 }
@@ -182,98 +322,55 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
     final style = stateManager.style;
 
     final isCurrentCell = stateManager.isCurrentCell(widget.cell);
+    final isSelectedCell = stateManager.isSelectedCell(
+      widget.cell,
+      widget.column,
+      widget.rowIdx,
+    );
 
-    _decoration = update(
-      _decoration,
-      _boxDecoration(
-        hasFocus: stateManager.hasFocus,
-        readOnly: widget.column.checkReadOnly(widget.row, widget.cell),
-        isEditing: stateManager.isEditing,
+    _decoration = BoxDecoration(
+      color: _getCellColor(
         isCurrentCell: isCurrentCell,
-        isSelectedCell: stateManager.isSelectedCell(
-          widget.cell,
-          widget.column,
-          widget.rowIdx,
-        ),
-        isGroupedRowCell: stateManager.enabledRowGroups &&
-            stateManager.rowGroupDelegate!.isExpandableCell(widget.cell),
-        enableCellVerticalBorder: style.enableCellBorderVertical,
-        borderColor: style.borderColor,
-        activatedBorderColor: style.activatedBorderColor,
-        activatedColor: style.activatedColor,
-        inactivatedBorderColor: style.inactivatedBorderColor,
-        gridBackgroundColor: style.gridBackgroundColor,
-        cellColorInEditState: style.cellColorInEditState,
-        cellColorInReadOnlyState: style.cellColorInReadOnlyState,
-        cellColorGroupedRow: style.cellColorGroupedRow,
+        isSelectedCell: isSelectedCell,
+        hasFocus: stateManager.hasFocus,
+        isEditing: stateManager.isEditing,
+        readOnly: widget.column.checkReadOnly(widget.row, widget.cell),
+        style: style,
         selectingMode: stateManager.selectingMode,
       ),
     );
   }
 
-  Color? _currentCellColor({
-    required bool readOnly,
-    required bool hasFocus,
-    required bool isEditing,
-    required Color activatedColor,
-    required Color gridBackgroundColor,
-    required Color cellColorInEditState,
-    required Color cellColorInReadOnlyState,
-    required PlutoGridSelectingMode selectingMode,
-  }) {
-    if (!hasFocus) {
-      return gridBackgroundColor;
-    }
-
-    if (!isEditing) {
-      return selectingMode.isRow ? activatedColor : null;
-    }
-
-    return readOnly == true ? cellColorInReadOnlyState : cellColorInEditState;
-  }
-
-  BoxDecoration _boxDecoration({
-    required bool hasFocus,
-    required bool readOnly,
-    required bool isEditing,
+  Color _getCellColor({
     required bool isCurrentCell,
     required bool isSelectedCell,
-    required bool isGroupedRowCell,
-    required bool enableCellVerticalBorder,
-    required Color borderColor,
-    required Color activatedBorderColor,
-    required Color activatedColor,
-    required Color inactivatedBorderColor,
-    required Color gridBackgroundColor,
-    required Color cellColorInEditState,
-    required Color cellColorInReadOnlyState,
-    required Color? cellColorGroupedRow,
+    required bool hasFocus,
+    required bool isEditing,
+    required bool readOnly,
+    required PlutoGridStyleConfig style,
     required PlutoGridSelectingMode selectingMode,
   }) {
-    if (isCurrentCell) {
-      return BoxDecoration(
-        color: _currentCellColor(
-          hasFocus: hasFocus,
-          isEditing: isEditing,
-          readOnly: readOnly,
-          gridBackgroundColor: gridBackgroundColor,
-          activatedColor: activatedColor,
-          cellColorInReadOnlyState: cellColorInReadOnlyState,
-          cellColorInEditState: cellColorInEditState,
-          selectingMode: selectingMode,
-        ),
-      );
-    } else if (isSelectedCell) {
-      return BoxDecoration(
-        color: activatedColor,
-      );
-    } else {
-      return BoxDecoration(
-        color: isGroupedRowCell ? cellColorGroupedRow : null,
-      );
-    }
-  }
+    // Cache frequently accessed style properties
+    final activatedColor = style.activatedColor;
+    final gridBgColor = style.gridBackgroundColor;
 
+    // Early return for the most common case (non-selected, non-current cell)
+    if (!isCurrentCell && !isSelectedCell) {
+      return Colors.transparent;
+    }
+
+    if (isCurrentCell) {
+      if (!hasFocus) return gridBgColor;
+      if (!isEditing) return selectingMode.isRow ? activatedColor : Colors.transparent;
+
+      return readOnly
+          ? style.cellColorInReadOnlyState
+          : style.cellColorInEditState;
+    }
+
+    // Only remaining case: isSelectedCell
+    return activatedColor;
+  }
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
@@ -285,17 +382,13 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
     );
   }
 }
-
 class _Cell extends PlutoStatefulWidget {
   final PlutoGridStateManager stateManager;
-
   final int rowIdx;
-
   final PlutoRow row;
-
   final PlutoColumn column;
-
   final PlutoCell cell;
+  final bool showMenu;
 
   const _Cell({
     required this.stateManager,
@@ -303,6 +396,7 @@ class _Cell extends PlutoStatefulWidget {
     required this.row,
     required this.column,
     required this.cell,
+    this.showMenu = false,
   });
 
   @override
@@ -311,6 +405,7 @@ class _Cell extends PlutoStatefulWidget {
 
 class _CellState extends PlutoStateWithChange<_Cell> {
   bool _showTypedCell = false;
+  bool _isHovered = false;
 
   @override
   PlutoGridStateManager get stateManager => widget.stateManager;
@@ -318,7 +413,6 @@ class _CellState extends PlutoStateWithChange<_Cell> {
   @override
   void initState() {
     super.initState();
-
     updateState(PlutoNotifierEventForceUpdate.instance);
   }
 
@@ -332,50 +426,66 @@ class _CellState extends PlutoStateWithChange<_Cell> {
 
   @override
   Widget build(BuildContext context) {
-    if (_showTypedCell && widget.column.enableEditingMode == true) {
-      if (widget.column.type.isSelect) {
-        return PlutoSelectCell(
-          stateManager: stateManager,
-          cell: widget.cell,
-          column: widget.column,
-          row: widget.row,
-        );
-      } else if (widget.column.type.isNumber) {
-        return PlutoNumberCell(
-          stateManager: stateManager,
-          cell: widget.cell,
-          column: widget.column,
-          row: widget.row,
-        );
-      } else if (widget.column.type.isDate) {
-        return PlutoDateCell(
-          stateManager: stateManager,
-          cell: widget.cell,
-          column: widget.column,
-          row: widget.row,
-        );
-      } else if (widget.column.type.isTime) {
-        return PlutoTimeCell(
-          stateManager: stateManager,
-          cell: widget.cell,
-          column: widget.column,
-          row: widget.row,
-        );
-      } else if (widget.column.type.isText) {
-        return PlutoTextCell(
-          stateManager: stateManager,
-          cell: widget.cell,
-          column: widget.column,
-          row: widget.row,
-        );
-      } else if (widget.column.type.isCurrency) {
-        return PlutoCurrencyCell(
-          stateManager: stateManager,
-          cell: widget.cell,
-          column: widget.column,
-          row: widget.row,
-        );
-      }
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: _showTypedCell && widget.column.enableEditingMode == true
+          ? _buildTypedCell()
+          : PlutoDefaultCell(
+        cell: widget.cell,
+        column: widget.column,
+        rowIdx: widget.rowIdx,
+        row: widget.row,
+        stateManager: stateManager,
+      ),
+    );
+  }
+
+  Widget _buildTypedCell() {
+    final columnType = widget.column.type;
+
+    if (columnType.isSelect) {
+      return PlutoSelectCell(
+        stateManager: stateManager,
+        cell: widget.cell,
+        column: widget.column,
+        row: widget.row,
+      );
+    } else if (columnType.isNumber) {
+      return PlutoNumberCell(
+        stateManager: stateManager,
+        cell: widget.cell,
+        column: widget.column,
+        row: widget.row,
+      );
+    } else if (columnType.isDate) {
+      return PlutoDateCell(
+        stateManager: stateManager,
+        cell: widget.cell,
+        column: widget.column,
+        row: widget.row,
+      );
+    } else if (columnType.isTime) {
+      return PlutoTimeCell(
+        stateManager: stateManager,
+        cell: widget.cell,
+        column: widget.column,
+        row: widget.row,
+      );
+    } else if (columnType.isText) {
+      return PlutoTextCell(
+        stateManager: stateManager,
+        cell: widget.cell,
+        column: widget.column,
+        row: widget.row,
+      );
+    } else if (columnType.isCurrency) {
+      return PlutoCurrencyCell(
+        stateManager: stateManager,
+        cell: widget.cell,
+        column: widget.column,
+        row: widget.row,
+      );
     }
 
     return PlutoDefaultCell(
@@ -385,5 +495,6 @@ class _CellState extends PlutoStateWithChange<_Cell> {
       row: widget.row,
       stateManager: stateManager,
     );
+  
   }
 }
