@@ -5,15 +5,22 @@ class PlutoCell {
   PlutoCell({
     dynamic value,
     Widget? widget,
+    Color? cellColor,
+
     Key? key,
   })  : _key = key ?? UniqueKey(),
         _value = value,
-        _widget = widget;
+        _widget = widget,
+  _cellColor = cellColor;
+
+
 
   final Key _key;
 
   dynamic _value;
   Widget? _widget;
+  Color? _cellColor;
+
 
   dynamic _valueForSorting;
 
@@ -71,6 +78,15 @@ class PlutoCell {
       return;
     }
     _widget = changed;
+  }
+
+  Color? get cellColor => _cellColor;
+
+  set cellColor(Color? changed) {
+    if (_cellColor == changed) {
+      return;
+    }
+    _cellColor = changed;
   }
 
   dynamic get valueForSorting {
