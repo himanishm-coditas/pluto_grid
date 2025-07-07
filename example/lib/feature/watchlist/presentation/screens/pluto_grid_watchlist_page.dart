@@ -13,16 +13,16 @@ class WatchlistPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AppInjector.getIt<WatchlistBloc>()..add(const LoadWatchlistEvent()),
+      create: (context) =>
+          AppInjector.getIt<WatchlistBloc>()..add(const LoadWatchlistEvent()),
       child: Scaffold(
         appBar: AppBar(
           title: const Text(AppStrings.watchlistTitle),
           actions: [
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: () => context
-                  .read<WatchlistBloc>()
-                  .add(const LoadWatchlistEvent()),
+              onPressed: () =>
+                  context.read<WatchlistBloc>().add(const LoadWatchlistEvent()),
               tooltip: AppStrings.refreshTooltip,
             ),
           ],
@@ -41,46 +41,47 @@ class _WatchlistBody extends StatelessWidget {
     return BlocBuilder<WatchlistBloc, WatchlistState>(
       builder: (context, state) {
         return switch (state) {
-          WatchlistInitial() => const Center(child: CircularProgressIndicator()),
+          WatchlistInitial() =>
+            const Center(child: CircularProgressIndicator()),
           WatchlistError(message: final message) => Center(
-            child: Column(
-              spacing: 16,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  message,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.errorColor,
+              child: Column(
+                spacing: 16,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    message,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.errorColor,
+                        ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                ElevatedButton(
-                  onPressed: () => context
-                      .read<WatchlistBloc>()
-                      .add(const LoadWatchlistEvent()),
-                  child: const Text(AppStrings.retry),
-                ),
-              ],
+                  ElevatedButton(
+                    onPressed: () => context
+                        .read<WatchlistBloc>()
+                        .add(const LoadWatchlistEvent()),
+                    child: const Text(AppStrings.retry),
+                  ),
+                ],
+              ),
             ),
-          ),
           WatchlistLoaded(items: final items) when items.isEmpty => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  AppStrings.noWatchlistItems,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => context
-                      .read<WatchlistBloc>()
-                      .add(const LoadWatchlistEvent()),
-                  child: const Text(AppStrings.refresh),
-                ),
-              ],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppStrings.noWatchlistItems,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context
+                        .read<WatchlistBloc>()
+                        .add(const LoadWatchlistEvent()),
+                    child: const Text(AppStrings.refresh),
+                  ),
+                ],
+              ),
             ),
-          ),
           WatchlistLoaded(items: final items) => _WatchlistGrid(items: items),
         };
       },
@@ -203,15 +204,32 @@ class _WatchlistGrid extends StatelessWidget {
     return items.map((item) {
       return PlutoRow(
         menuChildren: [
-          const IconButton(onPressed: null, icon: Icon(Icons.add,color: Colors.red,)),
-          const IconButton(onPressed: null, icon: Icon(Icons.edit,color: Colors.red,)),
-          const IconButton(onPressed: null, icon: Icon(Icons.delete,color: Colors.red,))
-        ], menuOptions: [
+          const IconButton(
+              onPressed: null,
+              icon: Icon(
+                Icons.add,
+                color: AppColors.errorColor,
+              )),
+          const IconButton(
+              onPressed: null,
+              icon: Icon(
+                Icons.edit,
+                color: AppColors.errorColor,
+              )),
+          const IconButton(
+              onPressed: null,
+              icon: Icon(
+                Icons.delete,
+                color: AppColors.errorColor,
+              ))
+        ],
+        menuOptions: [
           const TextButton(onPressed: null, child: Text(AppStrings.edit)),
           const TextButton(onPressed: null, child: Text(AppStrings.delete)),
         ],
         cells: {
-          'symbol': PlutoCell(value: item.symbol,widget: const Icon(Icons.ac_unit)),
+          'symbol':
+              PlutoCell(value: item.symbol, widget: const Icon(Icons.ac_unit)),
           'company': PlutoCell(value: item.company),
           'bid_qty': PlutoCell(value: item.bidQty),
           'bid_rate': PlutoCell(value: item.bidRate),
@@ -234,7 +252,6 @@ class _WatchlistGrid extends StatelessWidget {
         gridBorderColor: AppColors.gridBorderColor,
         rowHoverColor: AppColors.rowHoverColor,
       ),
-
       enableMoveHorizontalInEditing: true,
     );
   }
