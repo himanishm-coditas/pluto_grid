@@ -179,6 +179,7 @@ class _RowMenuWrapperState extends State<_RowMenuWrapper> {
   final _menuController = MenuController();
   final _optionsMenuController = MenuController();
   bool _isHovered = false;
+  bool _isInteractingWithMenu = false;
 
   @override
   void dispose() {
@@ -195,9 +196,12 @@ class _RowMenuWrapperState extends State<_RowMenuWrapper> {
       _isHovered = isHovered;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!_isHovered) {
+          // Close both menus when not hovered, regardless of interaction state
           _optionsMenuController.close();
           _menuController.close();
+          _isInteractingWithMenu = false;
         } else {
+          // Open main menu when hovered
           _menuController.open();
         }
       });
@@ -208,9 +212,16 @@ class _RowMenuWrapperState extends State<_RowMenuWrapper> {
       alignmentOffset: widget.menuOffset,
       menuChildren: [
         MouseRegion(
-          onEnter: (_) => widget.stateManager.setHoveredRow(widget.row),
+          onEnter: (_) {
+            widget.stateManager.setHoveredRow(widget.row);
+            if (!_isInteractingWithMenu) {
+              _menuController.open();
+            }
+          },
           onExit: (_) {
-            widget.stateManager.clearHoveredRow();
+            if (!_isInteractingWithMenu) {
+              widget.stateManager.clearHoveredRow();
+            }
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -230,9 +241,12 @@ class _RowMenuWrapperState extends State<_RowMenuWrapper> {
                   controller: _optionsMenuController,
                   crossAxisUnconstrained: false,
                   onOpen: () {
+                    _isInteractingWithMenu = true;
                     _menuController.open();
                   },
                   onClose: () {
+                    _isInteractingWithMenu = false;
+                    // Only close main menu if not hovered
                     if (!_isHovered) {
                       _menuController.close();
                     }

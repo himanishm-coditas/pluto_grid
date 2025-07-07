@@ -224,8 +224,8 @@ class _WatchlistGrid extends StatelessWidget {
               ))
         ],
         menuOptions: [
-          const TextButton(onPressed: null, child: Text(AppStrings.edit)),
-          const TextButton(onPressed: null, child: Text(AppStrings.delete)),
+           TextButton(onPressed: (){}, child: Text(AppStrings.edit)),
+           TextButton(onPressed: (){}, child: Text(AppStrings.delete)),
         ],
         cells: {
           'symbol':
