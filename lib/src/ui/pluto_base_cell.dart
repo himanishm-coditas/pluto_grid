@@ -194,14 +194,11 @@ class _RowMenuWrapperState extends State<_RowMenuWrapper> {
     if (isHovered != _isHovered) {
       _isHovered = isHovered;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_isHovered) {
-          if (!_menuController.isOpen) {
-            _menuController.open();
-          }
+        if (!_isHovered) {
+          _optionsMenuController.close();
+          _menuController.close();
         } else {
-          if (_menuController.isOpen && !_optionsMenuController.isOpen) {
-            _menuController.close();
-          }
+          _menuController.open();
         }
       });
     }
@@ -213,10 +210,7 @@ class _RowMenuWrapperState extends State<_RowMenuWrapper> {
         MouseRegion(
           onEnter: (_) => widget.stateManager.setHoveredRow(widget.row),
           onExit: (_) {
-              if (!_optionsMenuController.isOpen) {
-                widget.stateManager.clearHoveredRow();
-              }
-
+            widget.stateManager.clearHoveredRow();
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
