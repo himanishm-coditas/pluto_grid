@@ -314,13 +314,7 @@ class _RowContainerWidgetState extends PlutoStateWithChange<_RowContainerWidget>
       }
     }
 
-    if (stateManager.isRowHovered(widget.row) &&
-        stateManager.configuration.enableRowHoverColor) {
-      color = Color.alphaBlend(
-        stateManager.configuration.style.rowHoverColor,
-        color,
-      );
-    }
+    // REMOVED THIS BLOCK - we're handling hover at cell level now
 
     return isCheckedRow
         ? Color.alphaBlend(stateManager.configuration.style.checkedColor, color)

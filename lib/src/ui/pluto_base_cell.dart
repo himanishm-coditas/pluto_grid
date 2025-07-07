@@ -350,26 +350,43 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
     required PlutoGridStyleConfig style,
     required PlutoGridSelectingMode selectingMode,
   }) {
-    // Cache frequently accessed style properties
-    final activatedColor = style.activatedColor;
-    final gridBgColor = style.gridBackgroundColor;
+    // Starting  with transparent as base
+    Color color = Colors.transparent;
 
-    // Early return for the most common case (non-selected, non-current cell)
-    if (!isCurrentCell && !isSelectedCell) {
-      return Colors.transparent;
+    // Applying  cell's custom color if it exists (unless editing current cell)
+    if (widget.cell.cellColor != null && !(isCurrentCell && isEditing)) {
+      color = widget.cell.cellColor!;
+    }
+    // Otherwise applying  default grid coloring
+    else {
+      final activatedColor = style.activatedColor;
+      final gridBgColor = style.gridBackgroundColor;
+
+      if (isCurrentCell) {
+        if (!hasFocus) {
+          color = gridBgColor;
+        } else if (!isEditing) {
+          color = selectingMode.isRow ? activatedColor : Colors.transparent;
+        } else {
+          color = readOnly
+              ? style.cellColorInReadOnlyState
+              : style.cellColorInEditState;
+        }
+      } else if (isSelectedCell) {
+        color = activatedColor;
+      }
     }
 
-    if (isCurrentCell) {
-      if (!hasFocus) return gridBgColor;
-      if (!isEditing) return selectingMode.isRow ? activatedColor : Colors.transparent;
-
-      return readOnly
-          ? style.cellColorInReadOnlyState
-          : style.cellColorInEditState;
+    // Apply hover effect as an overlay if row is hovered
+    if (stateManager.isRowHovered(widget.row) &&
+        stateManager.configuration.enableRowHoverColor) {
+      color = Color.alphaBlend(
+        style.rowHoverColor.withValues(alpha: 0.3), // Adjusting opacity as needed
+        color,
+      );
     }
 
-    // Only remaining case: isSelectedCell
-    return activatedColor;
+    return color;
   }
   @override
   Widget build(BuildContext context) {

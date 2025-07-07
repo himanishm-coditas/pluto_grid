@@ -120,6 +120,7 @@ class _WatchlistGrid extends StatelessWidget {
         field: 'company',
         type: PlutoColumnType.text(),
         frozen: PlutoColumnFrozen.start,
+        backgroundColor: Colors.transparent
       ),
       PlutoColumn(
         title: AppStrings.bidQty,
@@ -224,15 +225,15 @@ class _WatchlistGrid extends StatelessWidget {
               ))
         ],
         menuOptions: [
-           TextButton(onPressed: (){}, child: Text(AppStrings.edit)),
-           TextButton(onPressed: (){}, child: Text(AppStrings.delete)),
+          const TextButton(onPressed: null, child: Text(AppStrings.edit)),
+          const TextButton(onPressed: null, child: Text(AppStrings.delete)),
         ],
         cells: {
           'symbol':
               PlutoCell(value: item.symbol, widget: const Icon(Icons.ac_unit)),
           'company': PlutoCell(value: item.company),
           'bid_qty': PlutoCell(value: item.bidQty),
-          'bid_rate': PlutoCell(value: item.bidRate),
+          'bid_rate': PlutoCell(value: item.bidRate,cellColor: Colors.red),
           'ask_qty': PlutoCell(value: item.askQty),
           'ask_rate': PlutoCell(value: item.askRate),
           'volume': PlutoCell(value: item.volume),
