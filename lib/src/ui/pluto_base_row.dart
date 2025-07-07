@@ -58,8 +58,8 @@ class PlutoBaseRow extends StatelessWidget {
     );
   }
 
-
-  PlutoVisibilityLayoutId _makeCell(PlutoColumn column,) {
+  PlutoVisibilityLayoutId _makeCell(PlutoColumn column,
+      {bool showMenu = false}) {
     return PlutoVisibilityLayoutId(
       id: column.field,
       child: PlutoBaseCell(
@@ -69,6 +69,7 @@ class PlutoBaseRow extends StatelessWidget {
         rowIdx: rowIdx,
         row: row,
         stateManager: stateManager,
+        showMenu: showMenu,
       ),
     );
   }
@@ -93,8 +94,18 @@ class PlutoBaseRow extends StatelessWidget {
         stateManager.setDragTargetRowIdx(null);
       },
       builder: (context, candidateData, rejectedData) {
+        final shouldShowMenu = row.hasMenu;
+        PlutoColumn? menuColumn;
 
+        if (shouldShowMenu) {
+          final potentialMenuColumns = columns
+              .where((col) =>
+          ( col.frozen.isStart && !col.hide)
+              )
+              .toList();
 
+          menuColumn = potentialMenuColumns.firstOrNull;
+        }
 
         return _RowContainerWidget(
           stateManager: stateManager,
@@ -116,6 +127,7 @@ class PlutoBaseRow extends StatelessWidget {
             children: columns.map((column) {
               return _makeCell(
                 column,
+                showMenu: shouldShowMenu && column == menuColumn,
               );
             }).toList(growable: false),
           )
@@ -129,6 +141,7 @@ class PlutoBaseRow extends StatelessWidget {
             children: columns.map((column) {
               return _makeCell(
                 column,
+                showMenu: shouldShowMenu && column == menuColumn,
               );
             }).toList(growable: false),
           ),
@@ -165,16 +178,14 @@ class _RowCellsLayoutDelegate extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
-    final isLTR = textDirection == TextDirection.ltr;
-    final items = isLTR ? columns : columns.reversed;
     double dx = 0;
 
-    for (var element in items) {
-      var width = element.width;
+    for (final column in columns) { // for more specific names
+      final width = column.width;
 
-      if (hasChild(element.field)) {
+      if (hasChild(column.field)) {
         layoutChild(
-          element.field,
+          column.field,
           BoxConstraints.tightFor(
             width: width,
             height: stateManager.rowHeight,
@@ -182,7 +193,7 @@ class _RowCellsLayoutDelegate extends MultiChildLayoutDelegate {
         );
 
         positionChild(
-          element.field,
+          column.field,
           Offset(dx, 0),
         );
       }
@@ -225,6 +236,14 @@ class _RowContainerWidgetState extends PlutoStateWithChange<_RowContainerWidget>
     with
         AutomaticKeepAliveClientMixin,
         PlutoStateWithKeepAlive<_RowContainerWidget> {
+  @override
+  void dispose() {
+    if (widget.stateManager.isRowHovered(widget.row)) {
+      widget.stateManager.clearHoveredRow();
+    }
+    super.dispose();
+  }
+
   @override
   PlutoGridStateManager get stateManager => widget.stateManager;
 

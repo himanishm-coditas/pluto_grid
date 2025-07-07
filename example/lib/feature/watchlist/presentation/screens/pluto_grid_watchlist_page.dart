@@ -202,6 +202,14 @@ class _WatchlistGrid extends StatelessWidget {
   List<PlutoRow> _buildRows() {
     return items.map((item) {
       return PlutoRow(
+        menuChildren: [
+          const IconButton(onPressed: null, icon: Icon(Icons.add,color: Colors.red,)),
+          const IconButton(onPressed: null, icon: Icon(Icons.edit,color: Colors.red,)),
+          const IconButton(onPressed: null, icon: Icon(Icons.delete,color: Colors.red,))
+        ], menuOptions: [
+          const TextButton(onPressed: null, child: Text(AppStrings.edit)),
+          const TextButton(onPressed: null, child: Text(AppStrings.delete)),
+        ],
         cells: {
           'symbol': PlutoCell(value: item.symbol,widget: const Icon(Icons.ac_unit)),
           'company': PlutoCell(value: item.company),
