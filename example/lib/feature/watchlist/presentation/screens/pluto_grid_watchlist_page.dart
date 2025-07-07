@@ -120,7 +120,6 @@ class _WatchlistGrid extends StatelessWidget {
         field: 'company',
         type: PlutoColumnType.text(),
         frozen: PlutoColumnFrozen.start,
-        backgroundColor: Colors.transparent
       ),
       PlutoColumn(
         title: AppStrings.bidQty,
