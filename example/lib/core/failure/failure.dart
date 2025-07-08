@@ -1,27 +1,32 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 
-abstract class Failure extends Equatable {
-  final String message;
-
+@immutable
+sealed class Failure extends Equatable {
   const Failure(this.message);
+
+  final String message;
 
   @override
   List<Object> get props => [message];
 }
 
-// Specific failure types
 class ServerFailure extends Failure {
-  const ServerFailure(String message) : super(message);
+  const ServerFailure(super.message);
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure(String message) : super(message);
+  const CacheFailure(super.message);
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure(String message) : super(message);
+  const NetworkFailure(super.message);
 }
 
 class InvalidInputFailure extends Failure {
-  const InvalidInputFailure(String message) : super(message);
+  const InvalidInputFailure(super.message);
+}
+
+class ParsingFailure extends Failure {
+  const ParsingFailure(super.message);
 }

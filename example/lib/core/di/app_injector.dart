@@ -14,27 +14,25 @@ class AppInjector {
   static final GetIt getIt = GetIt.instance;
 
   static Future<void> setupLocator() async {
-    getIt.registerLazySingleton<JsonService>(() => JsonService());
-
-    getIt.registerLazySingleton<WatchlistLocalDataSource>(
-      () => WatchlistLocalDataSource(jsonService: getIt<JsonService>()),
-    );
-
-    getIt.registerLazySingleton<WatchlistRepository>(
-      () => WatchlistRepositoryImpl(
-        localDataSource: getIt<WatchlistLocalDataSource>(),
-      ),
-    );
-
-    getIt.registerLazySingleton<WatchlistUsecase>(
-      () => WatchlistUsecase(
-        getIt<WatchlistRepository>(),
-      ),
-    );
-    getIt.registerFactory<WatchlistBloc>(
-      () => WatchlistBloc(
-        watchlistUsecase: getIt<WatchlistUsecase>(),
-      ),
-    );
+    getIt
+      ..registerLazySingleton<JsonService>(JsonService.new)
+      ..registerLazySingleton<WatchlistLocalDataSource>(
+            () => WatchlistLocalDataSource(jsonService: getIt<JsonService>()),
+      )
+      ..registerLazySingleton<WatchlistRepository>(
+            () => WatchlistRepositoryImpl(
+          localDataSource: getIt<WatchlistLocalDataSource>(),
+        ),
+      )
+      ..registerLazySingleton<WatchlistUsecase>(
+            () => WatchlistUsecase(
+          getIt<WatchlistRepository>(),
+        ),
+      )
+      ..registerFactory<WatchlistBloc>(
+            () => WatchlistBloc(
+          watchlistUsecase: getIt<WatchlistUsecase>(),
+        ),
+      );
   }
 }
