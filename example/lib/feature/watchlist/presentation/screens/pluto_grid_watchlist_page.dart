@@ -109,7 +109,6 @@ class _WatchlistGrid extends StatelessWidget {
           minWidth: 224,
           enableContextMenu: false,
           enableDropToResize: false,
-          suppressedAutoSize: true,
         ),
         PlutoColumn(
           title: AppStrings.bidQty,
@@ -166,7 +165,6 @@ class _WatchlistGrid extends StatelessWidget {
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
           readOnly: true,
-          suppressedAutoSize: true,
           enableContextMenu: false,
           enableDropToResize: false,
           minWidth: 160,
