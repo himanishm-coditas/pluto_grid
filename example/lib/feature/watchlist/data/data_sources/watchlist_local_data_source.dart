@@ -3,12 +3,20 @@
 import 'package:dartz/dartz.dart';
 import 'package:example/core/failure/failure.dart';
 import 'package:example/core/services/local_json_service.dart';
+import 'package:example/core/services/storage/shared_prefs_keys.dart';
+import 'package:example/core/services/storage/shared_prefs_service.dart';
 import 'package:example/feature/watchlist/data/models/watchlist_item_model.dart';
 
 class WatchlistLocalDataSource {
-  WatchlistLocalDataSource({required this.jsonService});
+  WatchlistLocalDataSource({
+    required this.jsonService,
+    required this.sharedPrefsService,
+  });
 
   final JsonService jsonService;
+
+  ///responsible service for persisting theme in shared preference
+  final SharedPrefsService sharedPrefsService;
 
   Future<Either<Failure, List<WatchlistItemModel>>> getWatchlistItems() async {
     final Either<Failure, List<WatchlistItemModel>> result =
@@ -22,4 +30,12 @@ class WatchlistLocalDataSource {
     );
     return result;
   }
+
+  /// Save theme preference
+  Future<void> saveThemePreference({required final bool isDark}) =>
+      sharedPrefsService.setBool(key: SharedPrefsKeys.themeKey, value: isDark);
+
+  /// Load theme preference
+  bool loadThemePreference() =>
+      sharedPrefsService.getBool(SharedPrefsKeys.themeKey) ?? true;
 }

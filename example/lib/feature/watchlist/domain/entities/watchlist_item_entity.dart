@@ -14,6 +14,9 @@ class WatchlistItemEntity extends Equatable {
     this.low52w,
     this.ltp,
     this.change,
+    this.atp,
+    this.open,
+    this.previousClose,
   });
   final String? symbol;
   final String? company;
@@ -26,6 +29,10 @@ class WatchlistItemEntity extends Equatable {
   final double? low52w;
   final double? ltp;
   final String? change;
+  final double? atp;
+  final double? open;
+  final double? previousClose;
+
 
   @override
   List<Object?> get props => <Object?>[
@@ -40,5 +47,8 @@ class WatchlistItemEntity extends Equatable {
     low52w,
     ltp,
     change,
+    atp,
+    open,
+    previousClose
   ];
 }

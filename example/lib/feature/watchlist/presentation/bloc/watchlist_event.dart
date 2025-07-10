@@ -11,3 +11,11 @@ sealed class WatchlistEvent extends Equatable {
 class LoadWatchlistEvent extends WatchlistEvent {
   const LoadWatchlistEvent();
 }
+
+class ToggleThemeEvent extends WatchlistEvent {
+  const ToggleThemeEvent();
+}
+
+class LoadThemeEvent extends WatchlistEvent {
+  const LoadThemeEvent();
+}
