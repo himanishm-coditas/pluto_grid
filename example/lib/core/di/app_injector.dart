@@ -41,7 +41,7 @@ class AppInjector {
         ),
       )
       ..registerLazySingleton<ThemeController>(
-            () => ThemeController(getIt<WatchlistUsecase>()),
+            () => ThemeController(getIt<WatchlistRepository>()),
       );
   }
 }

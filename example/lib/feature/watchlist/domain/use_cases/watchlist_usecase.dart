@@ -10,9 +10,4 @@ class WatchlistUsecase {
 
   Future<Either<Failure, List<WatchlistItemEntity>>> getWatchlistItems() =>
       repository.getWatchlistItems();
-
-  Future<void> saveThemePreference({required final bool isDark}) =>
-      repository.saveThemePreference(isDark: isDark);
-
-  bool loadThemePreference() => repository.loadThemePreference();
 }

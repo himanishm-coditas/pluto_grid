@@ -1,13 +1,13 @@
-import 'package:example/feature/watchlist/domain/use_cases/watchlist_usecase.dart';
+import 'package:example/feature/watchlist/domain/repositories/watchlist_repository.dart';
 import 'package:flutter/material.dart';
 
 class ThemeController extends ValueNotifier<ThemeMode> {
-  ThemeController(this._watchlistUsecase) : super(ThemeMode.light);
+  ThemeController(this._watchlistRepository) : super(ThemeMode.light);
 
-  final WatchlistUsecase _watchlistUsecase;
+  final WatchlistRepository _watchlistRepository;
 
   Future<void> initialize() async {
-    final bool isDark = _watchlistUsecase.loadThemePreference();
+    final bool isDark = _watchlistRepository.loadThemePreference();
     value = isDark ? ThemeMode.dark : ThemeMode.light;
   }
 
@@ -17,17 +17,17 @@ class ThemeController extends ValueNotifier<ThemeMode> {
     value = newTheme;
 
     // Save the theme preference
-    await _watchlistUsecase.saveThemePreference(
+    await _watchlistRepository.saveThemePreference(
         isDark: newTheme == ThemeMode.dark);
   }
 
   Future<void> setLight() async {
     value = ThemeMode.light;
-    await _watchlistUsecase.saveThemePreference(isDark: false);
+    await _watchlistRepository.saveThemePreference(isDark: false);
   }
 
   Future<void> setDark() async {
     value = ThemeMode.dark;
-    await _watchlistUsecase.saveThemePreference(isDark: true);
+    await _watchlistRepository.saveThemePreference(isDark: true);
   }
 }
