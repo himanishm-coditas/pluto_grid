@@ -1,47 +1,29 @@
 part of 'watchlist_bloc.dart';
 
 @immutable
-sealed class WatchlistState extends Equatable {
-  const WatchlistState({this.isDarkTheme = true});
-
-  final bool isDarkTheme;
+sealed  class WatchlistState extends Equatable {
+  const WatchlistState();
 
   @override
-  List<Object?> get props => <Object?>[isDarkTheme];
+  List<Object?> get props => <Object?>[];
 }
 
-class WatchlistInitial extends WatchlistState {
-  const WatchlistInitial({super.isDarkTheme});
-}
+class WatchlistInitial extends WatchlistState {}
 
 class WatchlistLoaded extends WatchlistState {
-  const WatchlistLoaded({
-    required this.items,
-    super.isDarkTheme,
-  });
 
+  const WatchlistLoaded(this.items);
   final List<WatchlistItemEntity> items;
 
   @override
-  List<Object?> get props => <Object?>[items, isDarkTheme];
-
-  WatchlistLoaded copyWith({
-    final List<WatchlistItemEntity>? items,
-    final bool? isDarkTheme,
-  }) => WatchlistLoaded(
-      items: items ?? this.items,
-      isDarkTheme: isDarkTheme ?? this.isDarkTheme,
-    );
+  List<Object?> get props => <Object?>[items];
 }
 
 class WatchlistError extends WatchlistState {
-  const WatchlistError({
-    required this.message,
-    super.isDarkTheme,
-  });
 
+  const WatchlistError(this.message);
   final String message;
 
   @override
-  List<Object?> get props => <Object?>[message, isDarkTheme];
+  List<Object?> get props => <Object?>[message];
 }

@@ -1,6 +1,8 @@
 import 'package:example/core/constants/app_colors.dart';
 import 'package:example/core/constants/app_strings.dart';
 import 'package:example/core/constants/app_textstyles.dart';
+import 'package:example/core/controller/theme_controller.dart';
+import 'package:example/core/di/app_injector.dart';
 import 'package:example/core/theming/app_themes.dart';
 import 'package:example/feature/watchlist/domain/entities/watchlist_item_entity.dart';
 import 'package:example/feature/watchlist/presentation/bloc/watchlist_bloc.dart';
@@ -14,21 +16,29 @@ class WatchlistPage extends StatelessWidget {
   const WatchlistPage({super.key});
 
   @override
-  Widget build(final BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text(AppStrings.watchlistTitle),
-          actions: <Widget>[
-            RefreshButton(
+  Widget build(final BuildContext context) => BlocProvider<WatchlistBloc>(
+        create: (final BuildContext context) =>
+            AppInjector.getIt<WatchlistBloc>()..add(const LoadWatchlistEvent()),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text(AppStrings.watchlistTitle),
+            actions: <Widget>[
+              RefreshButton(
                 onPressed: () => context
                     .read<WatchlistBloc>()
-                    .add(const LoadWatchlistEvent()),),
-            ToggleThemeButton(
-                onPressed: () => context
-                    .read<WatchlistBloc>()
-                    .add(const ToggleThemeEvent()),),
-          ],
+                    .add(const LoadWatchlistEvent()),
+              ),
+              ToggleThemeButton(
+                onPressed: () async {
+                  final ThemeController themeController =
+                      AppInjector.getIt<ThemeController>();
+                  await themeController.toggleTheme();
+                },
+              ),
+            ],
+          ),
+          body: const _WatchlistBody(),
         ),
-        body: const _WatchlistBody(),
       );
 }
 
@@ -43,22 +53,23 @@ class _WatchlistBody extends StatelessWidget {
           WatchlistInitial() =>
             const Center(child: CircularProgressIndicator()),
           WatchlistError(message: final String message) => Column(
-            spacing: 16,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                message,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.errorColor,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              RefreshButton(
+              spacing: 16,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  message,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppColors.errorColor,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+                RefreshButton(
                   onPressed: () => context
                       .read<WatchlistBloc>()
-                      .add(const LoadWatchlistEvent()),),
-            ],
-          ),
+                      .add(const LoadWatchlistEvent()),
+                ),
+              ],
+            ),
           WatchlistLoaded(items: final List<WatchlistItemEntity> items)
               when items.isEmpty =>
             Column(
@@ -79,25 +90,31 @@ class _WatchlistBody extends StatelessWidget {
             ),
           WatchlistLoaded(
             items: final List<WatchlistItemEntity> items,
-            isDarkTheme: final bool isDarkTheme
           ) =>
-            _WatchlistGrid(items: items, isDarkTheme: isDarkTheme),
+            _WatchlistGrid(
+              items: items,
+            ),
         },
       );
 }
 
 class _WatchlistGrid extends StatelessWidget {
-  const _WatchlistGrid({required this.items, required this.isDarkTheme});
+  const _WatchlistGrid({
+    required this.items,
+  });
 
   final List<WatchlistItemEntity> items;
-  final bool isDarkTheme;
 
   @override
-  Widget build(final BuildContext context) => PlutoGrid(
-        columns: _buildColumns(),
-        rows: _buildRows(),
-        configuration: _buildGridConfig(),
-      );
+  Widget build(final BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return PlutoGrid(
+            columns: _buildColumns(),
+            rows: _buildRows(),
+            configuration: _buildGridConfig(isDarkMode),
+          );
+  }
 
   List<PlutoColumn> _buildColumns() => <PlutoColumn>[
         PlutoColumn(
@@ -295,11 +312,13 @@ class _WatchlistGrid extends StatelessWidget {
       )
       .toList();
 
-  PlutoGridConfiguration _buildGridConfig() => PlutoGridConfiguration(
-        columnSize: const PlutoGridColumnSizeConfig(
-          autoSizeMode: PlutoAutoSizeMode.scale,
-        ),
-        style: isDarkTheme ? AppTheme.darkPlutoStyle : AppTheme.lightPlutoStyle,
-        enableMoveHorizontalInEditing: true,
-      );
+  PlutoGridConfiguration _buildGridConfig(bool isDarkMode) => PlutoGridConfiguration(
+    columnSize: const PlutoGridColumnSizeConfig(
+      autoSizeMode: PlutoAutoSizeMode.scale,
+    ),
+    style: isDarkMode
+        ? AppTheme.darkPlutoStyle
+        : AppTheme.lightPlutoStyle,
+    enableMoveHorizontalInEditing: true,
+  );
 }

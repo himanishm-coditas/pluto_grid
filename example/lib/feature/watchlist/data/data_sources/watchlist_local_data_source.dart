@@ -3,8 +3,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:example/core/failure/failure.dart';
 import 'package:example/core/services/local_json_service.dart';
-import 'package:example/core/services/storage/shared_prefs_keys.dart';
-import 'package:example/core/services/storage/shared_prefs_service.dart';
+import 'package:example/core/services/storage/local_storage_keys.dart';
+import 'package:example/core/services/storage/local_storage_service.dart';
 import 'package:example/feature/watchlist/data/models/watchlist_item_model.dart';
 
 class WatchlistLocalDataSource {

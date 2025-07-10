@@ -1,5 +1,6 @@
+import 'package:example/core/controller/theme_controller.dart';
 import 'package:example/core/services/local_json_service.dart';
-import 'package:example/core/services/storage/shared_prefs_service.dart';
+import 'package:example/core/services/storage/local_storage_service.dart';
 import 'package:example/feature/watchlist/data/data_sources/watchlist_local_data_source.dart';
 
 import 'package:example/feature/watchlist/data/repositories/watchlist_repository_impl.dart';
@@ -20,11 +21,12 @@ class AppInjector {
       ..registerLazySingleton<SharedPrefsService>(SharedPrefsService.new)
       ..registerLazySingleton<WatchlistLocalDataSource>(
         () => WatchlistLocalDataSource(
-            jsonService: getIt<JsonService>(),
-            sharedPrefsService: getIt<SharedPrefsService>(),),
+          jsonService: getIt<JsonService>(),
+          sharedPrefsService: getIt<SharedPrefsService>(),
+        ),
       )
       ..registerLazySingleton<WatchlistRepository>(
-            () => WatchlistRepositoryImpl(
+        () => WatchlistRepositoryImpl(
           localDataSource: getIt<WatchlistLocalDataSource>(),
         ),
       )
@@ -37,6 +39,9 @@ class AppInjector {
             () => WatchlistBloc(
           watchlistUsecase: getIt<WatchlistUsecase>(),
         ),
+      )
+      ..registerLazySingleton<ThemeController>(
+            () => ThemeController(getIt<WatchlistUsecase>()),
       );
   }
 }
