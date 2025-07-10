@@ -9,6 +9,7 @@ class AppTheme {
     rowHoverColor: AppColors.rowHoverColor,
     columnTextStyle: AppTextStyles.columnTitleTextStyle,
     cellTextStyle: AppTextStyles.cellTextStyle,
+    enableCellBorderVertical:false ,
     columnHeight: 32,
     rowHeight: 40,
   );
@@ -20,6 +21,7 @@ class AppTheme {
       cellTextStyle: AppTextStyles.cellTextStyle
           .copyWith(color: AppColors.cellTextColorDark),
       columnHeight: 32,
-      rowHeight: 40,
+    enableCellBorderVertical:false ,
+    rowHeight: 40,
   gridBackgroundColor: AppColors.gridBackgroundColor,);
 }
