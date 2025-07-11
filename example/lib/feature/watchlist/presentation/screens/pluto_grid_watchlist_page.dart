@@ -103,7 +103,6 @@ class _WatchlistBody extends StatelessWidget {
 
 class _WatchlistGrid extends StatelessWidget {
   const _WatchlistGrid({
-    super.key,
     required this.items,
   });
 
@@ -290,7 +289,7 @@ class _WatchlistGrid extends StatelessWidget {
               'symbol': PlutoCell(value: item.symbol, cellColor: cellBg),
               'bid_qty': PlutoCell(value: item.bidQty, cellColor: cellBg),
               'bid_rate': PlutoCell(value: item.bidRate, cellColor: cellBg,),
-              'ask_qty': PlutoCell(value: item.askQty,  cellColor: isDarkMode ? Colors.yellow : null),
+              'ask_qty': PlutoCell(value: item.askQty,  cellColor: isDarkMode ? AppColors.successColor : null),
               'ask_rate': PlutoCell(value: item.askRate, cellColor: cellBg),
               'volume': PlutoCell(value: item.volume, cellColor: cellBg),
               'atp': PlutoCell(value: item.atp, cellColor: cellBg),
