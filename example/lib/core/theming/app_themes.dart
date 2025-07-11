@@ -12,16 +12,21 @@ class AppTheme {
     enableCellBorderVertical:false ,
     columnHeight: 32,
     rowHeight: 40,
+    gridBorderColor: AppColors.gridBorderColor,
+    borderColor: AppColors.gridBorderColor,
+
   );
 
   static PlutoGridStyleConfig darkPlutoStyle = PlutoGridStyleConfig(
       rowHoverColor: AppColors.rowHoverColorDark,
+      gridBorderColor: AppColors.gridBorderColorDark,
       columnTextStyle: AppTextStyles.columnTitleTextStyle
           .copyWith(color: AppColors.columnTitleTextColorDark),
       cellTextStyle: AppTextStyles.cellTextStyle
           .copyWith(color: AppColors.cellTextColorDark),
       columnHeight: 32,
     enableCellBorderVertical:false ,
+    borderColor: AppColors.gridBorderColorDark,
     rowHeight: 40,
   gridBackgroundColor: AppColors.gridBackgroundColor,);
 }
