@@ -114,7 +114,7 @@ class _WatchlistGrid extends StatelessWidget {
     final bool isDarkMode = brightness == Brightness.dark;
 
     return PlutoGrid(
-      key: ValueKey(brightness), // 👈 force rebuild on theme change
+      key: ValueKey<Brightness>(brightness), // Rebuilding on theme change
       columns: _buildColumns(),
       rows: _buildRows(isDarkMode),
       configuration: _buildGridConfig(isDarkMode),
