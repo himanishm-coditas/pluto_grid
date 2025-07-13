@@ -4,13 +4,17 @@ import 'package:pluto_grid/pluto_grid.dart';
 class PlutoCell {
   PlutoCell({
     dynamic value,
+    Color? cellColor,
     Key? key,
   })  : _key = key ?? UniqueKey(),
-        _value = value;
+        _value = value,
+        _cellColor = cellColor;
 
   final Key _key;
 
   dynamic _value;
+  ///Property responsible for changing cell color
+  Color? _cellColor;
 
   dynamic _valueForSorting;
 
@@ -31,6 +35,15 @@ class PlutoCell {
   Key get key => _key;
 
   bool get initialized => _column != null && _row != null;
+
+  Color? get cellColor => _cellColor;
+
+  set cellColor(Color? changed) {
+    if (_cellColor == changed) {
+      return;
+    }
+    _cellColor = changed;
+  }
 
   PlutoColumn get column {
     _assertUnInitializedCell(_column != null);

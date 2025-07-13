@@ -294,15 +294,6 @@ class _RowContainerWidgetState extends PlutoStateWithChange<_RowContainerWidget>
         color = stateManager.configuration.style.activatedColor;
       }
     }
-
-    if (stateManager.isRowHovered(widget.row) &&
-        stateManager.configuration.enableRowHoverColor) {
-      color = Color.alphaBlend(
-        stateManager.configuration.style.rowHoverColor,
-        color,
-      );
-    }
-
     return isCheckedRow
         ? Color.alphaBlend(stateManager.configuration.style.checkedColor, color)
         : color;
