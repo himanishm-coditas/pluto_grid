@@ -127,6 +127,7 @@ class _WatchlistGrid extends StatelessWidget {
           field: 'symbol',
           type: PlutoColumnType.text(),
           frozen: PlutoColumnFrozen.start,
+          enableColumnDrag: false,
           readOnly: true,
           minWidth: 224,
           enableContextMenu: false,
@@ -197,6 +198,7 @@ class _WatchlistGrid extends StatelessWidget {
                     ? AppColors.positiveChange
                     : AppColors.negativeChange,
               ),
+
             );
           },
         ),
@@ -215,6 +217,7 @@ class _WatchlistGrid extends StatelessWidget {
           title: AppStrings.volume,
           field: 'volume',
           minWidth: 136,
+          suppressedAutoSize: true,
           type: PlutoColumnType.number(),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
@@ -288,8 +291,13 @@ class _WatchlistGrid extends StatelessWidget {
             cells: <String, PlutoCell>{
               'symbol': PlutoCell(value: item.symbol, cellColor: cellBg),
               'bid_qty': PlutoCell(value: item.bidQty, cellColor: cellBg),
-              'bid_rate': PlutoCell(value: item.bidRate, cellColor: cellBg,),
-              'ask_qty': PlutoCell(value: item.askQty,  cellColor: isDarkMode ? AppColors.successColor : null),
+              'bid_rate': PlutoCell(
+                value: item.bidRate,
+                cellColor: cellBg,
+              ),
+              'ask_qty': PlutoCell(
+                  value: item.askQty,
+                  cellColor: isDarkMode ? AppColors.successColor : null,),
               'ask_rate': PlutoCell(value: item.askRate, cellColor: cellBg),
               'volume': PlutoCell(value: item.volume, cellColor: cellBg),
               'atp': PlutoCell(value: item.atp, cellColor: cellBg),
@@ -311,7 +319,6 @@ class _WatchlistGrid extends StatelessWidget {
         columnSize: const PlutoGridColumnSizeConfig(
           autoSizeMode: PlutoAutoSizeMode.scale,
         ),
-
         style: isDarkMode ? AppTheme.darkPlutoStyle : AppTheme.lightPlutoStyle,
         enableMoveHorizontalInEditing: true,
       );
