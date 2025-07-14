@@ -13,6 +13,9 @@ class WatchlistItemModel extends WatchlistItemEntity {
     super.low52w,
     super.ltp,
     super.change,
+    super.atp,
+    super.open,
+    super.previousClose,
   });
 
   factory WatchlistItemModel.fromJson(final Map<String, dynamic> json) =>
@@ -28,19 +31,26 @@ class WatchlistItemModel extends WatchlistItemEntity {
         low52w: json['low_52w'] ?? 0.0,
         ltp: json['ltp'] ?? 0.0,
         change: json['change'] ?? "",
+        atp: json['atp'] ?? 0.0,
+        open: json['open'] ?? 0.0,
+        previousClose: json['previous_close'] ?? 0.0,
       );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'symbol': symbol,
-    'company': company,
-    'bid_qty': bidQty,
-    'bid_rate': bidRate,
-    'ask_qty': askQty,
-    'ask_rate': askRate,
-    'volume': volume,
-    'high_52w': high52w,
-    'low_52w': low52w,
-    'ltp': ltp,
-    'change': change,
-  };
+        'symbol': symbol,
+        'company': company,
+        'bid_qty': bidQty,
+        'bid_rate': bidRate,
+        'ask_qty': askQty,
+        'ask_rate': askRate,
+        'volume': volume,
+        'high_52w': high52w,
+        'low_52w': low52w,
+        'ltp': ltp,
+        'change': change,
+        'atp': atp,
+        'open': open,
+        'previous_close': previousClose,
+
+      };
 }
