@@ -21,7 +21,10 @@ class WatchlistPage extends StatelessWidget {
             AppInjector.getIt<WatchlistBloc>()..add(const LoadWatchlistEvent()),
         child: Scaffold(
           appBar: AppBar(
-            title: const Text(AppStrings.watchlistTitle),
+            title: const Text(
+              AppStrings.watchlistTitle,
+              style: AppTextStyles.appTitleTextStyle,
+            ),
             actions: <Widget>[
               RefreshButton(
                 onPressed: () => context
@@ -107,13 +110,15 @@ class _WatchlistGrid extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Brightness brightness = Theme.of(context).brightness;
+    final bool isDarkMode = brightness == Brightness.dark;
 
     return PlutoGrid(
-            columns: _buildColumns(),
-            rows: _buildRows(),
-            configuration: _buildGridConfig(isDarkMode),
-          );
+      key: ValueKey<Brightness>(brightness), // Rebuilding on theme change
+      columns: _buildColumns(),
+      rows: _buildRows(isDarkMode),
+      configuration: _buildGridConfig(isDarkMode),
+    );
   }
 
   List<PlutoColumn> _buildColumns() => <PlutoColumn>[
@@ -122,6 +127,7 @@ class _WatchlistGrid extends StatelessWidget {
           field: 'symbol',
           type: PlutoColumnType.text(),
           frozen: PlutoColumnFrozen.start,
+          enableColumnDrag: false,
           readOnly: true,
           minWidth: 224,
           enableContextMenu: false,
@@ -141,9 +147,7 @@ class _WatchlistGrid extends StatelessWidget {
         PlutoColumn(
           title: AppStrings.bidRate,
           field: 'bid_rate',
-          type: PlutoColumnType.number(
-            format: '#,##0.00',
-          ),
+          type: PlutoColumnType.number(format: '#,##0.00'),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
           readOnly: true,
@@ -154,9 +158,7 @@ class _WatchlistGrid extends StatelessWidget {
         PlutoColumn(
           title: AppStrings.askRate,
           field: 'ask_rate',
-          type: PlutoColumnType.number(
-            format: '#,##0.00',
-          ),
+          type: PlutoColumnType.number(format: '#,##0.00'),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
           readOnly: true,
@@ -196,6 +198,7 @@ class _WatchlistGrid extends StatelessWidget {
                     ? AppColors.positiveChange
                     : AppColors.negativeChange,
               ),
+
             );
           },
         ),
@@ -214,6 +217,7 @@ class _WatchlistGrid extends StatelessWidget {
           title: AppStrings.volume,
           field: 'volume',
           minWidth: 136,
+          suppressedAutoSize: true,
           type: PlutoColumnType.number(),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
@@ -224,9 +228,7 @@ class _WatchlistGrid extends StatelessWidget {
         PlutoColumn(
           title: AppStrings.ltp,
           field: 'ltp',
-          type: PlutoColumnType.number(
-            format: '#,##0.00',
-          ),
+          type: PlutoColumnType.number(format: '#,##0.00'),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
           readOnly: true,
@@ -237,9 +239,7 @@ class _WatchlistGrid extends StatelessWidget {
         PlutoColumn(
           title: AppStrings.open,
           field: 'open',
-          type: PlutoColumnType.number(
-            format: '#,##0.00',
-          ),
+          type: PlutoColumnType.number(format: '#,##0.00'),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
           readOnly: true,
@@ -250,9 +250,7 @@ class _WatchlistGrid extends StatelessWidget {
         PlutoColumn(
           title: AppStrings.high52w,
           field: 'high_52w',
-          type: PlutoColumnType.number(
-            format: '#,##0.00',
-          ),
+          type: PlutoColumnType.number(format: '#,##0.00'),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
           readOnly: true,
@@ -263,9 +261,7 @@ class _WatchlistGrid extends StatelessWidget {
         PlutoColumn(
           title: AppStrings.low52w,
           field: 'low_52w',
-          type: PlutoColumnType.number(
-            format: '#,##0.00',
-          ),
+          type: PlutoColumnType.number(format: '#,##0.00'),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
           readOnly: true,
@@ -276,9 +272,7 @@ class _WatchlistGrid extends StatelessWidget {
         PlutoColumn(
           title: AppStrings.previousClose,
           field: 'previous_close',
-          type: PlutoColumnType.number(
-            format: '#,##0.00',
-          ),
+          type: PlutoColumnType.number(format: '#,##0.00'),
           titleTextAlign: PlutoColumnTextAlign.right,
           textAlign: PlutoColumnTextAlign.right,
           readOnly: true,
@@ -288,37 +282,44 @@ class _WatchlistGrid extends StatelessWidget {
         ),
       ];
 
-  List<PlutoRow> _buildRows() => items
-      .map(
-        (final WatchlistItemEntity item) => PlutoRow(
-          cells: <String, PlutoCell>{
-            'symbol': PlutoCell(
-              value: item.symbol,
-            ),
-            'bid_qty': PlutoCell(value: item.bidQty),
-            'bid_rate': PlutoCell(value: item.bidRate),
-            'ask_qty': PlutoCell(value: item.askQty),
-            'ask_rate': PlutoCell(value: item.askRate),
-            'volume': PlutoCell(value: item.volume),
-            'atp': PlutoCell(value: item.atp),
-            'open': PlutoCell(value: item.open),
-            'high_52w': PlutoCell(value: item.high52w),
-            'low_52w': PlutoCell(value: item.low52w),
-            'ltp': PlutoCell(value: item.ltp),
-            'change': PlutoCell(value: item.change),
-            'previous_close': PlutoCell(value: item.previousClose),
-          },
-        ),
-      )
-      .toList();
+  List<PlutoRow> _buildRows(final bool isDarkMode) {
+     final Color? cellBg = isDarkMode ? AppColors.gridBackgroundColor : null;
 
-  PlutoGridConfiguration _buildGridConfig(bool isDarkMode) => PlutoGridConfiguration(
-    columnSize: const PlutoGridColumnSizeConfig(
-      autoSizeMode: PlutoAutoSizeMode.scale,
-    ),
-    style: isDarkMode
-        ? AppTheme.darkPlutoStyle
-        : AppTheme.lightPlutoStyle,
-    enableMoveHorizontalInEditing: true,
-  );
+    return items
+        .map(
+          (final WatchlistItemEntity item) => PlutoRow(
+            cells: <String, PlutoCell>{
+              'symbol': PlutoCell(value: item.symbol, cellColor: cellBg),
+              'bid_qty': PlutoCell(value: item.bidQty, cellColor: cellBg),
+              'bid_rate': PlutoCell(
+                value: item.bidRate,
+                cellColor: cellBg,
+              ),
+              'ask_qty': PlutoCell(
+                  value: item.askQty,
+                  cellColor: isDarkMode ? AppColors.successColor : null,),
+              'ask_rate': PlutoCell(value: item.askRate, cellColor: cellBg),
+              'volume': PlutoCell(value: item.volume, cellColor: cellBg),
+              'atp': PlutoCell(value: item.atp, cellColor: cellBg),
+              'open': PlutoCell(value: item.open, cellColor: cellBg),
+              'high_52w': PlutoCell(value: item.high52w, cellColor: cellBg),
+              'low_52w': PlutoCell(value: item.low52w, cellColor: cellBg),
+              'ltp': PlutoCell(value: item.ltp, cellColor: cellBg),
+              'change': PlutoCell(value: item.change, cellColor: cellBg),
+              'previous_close':
+                  PlutoCell(value: item.previousClose, cellColor: cellBg),
+            },
+          ),
+        )
+        .toList();
+  }
+
+  PlutoGridConfiguration _buildGridConfig(final bool isDarkMode) =>
+      PlutoGridConfiguration(
+        columnSize: const PlutoGridColumnSizeConfig(
+          autoSizeMode: PlutoAutoSizeMode.scale,
+        ),
+        style: isDarkMode ? AppTheme.darkPlutoStyle : AppTheme.lightPlutoStyle,
+        enableMoveHorizontalInEditing: true,
+      );
 }

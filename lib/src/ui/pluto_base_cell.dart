@@ -207,6 +207,9 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
         cellColorInReadOnlyState: style.cellColorInReadOnlyState,
         cellColorGroupedRow: style.cellColorGroupedRow,
         selectingMode: stateManager.selectingMode,
+        isRowHovered: stateManager.isRowHovered(widget.row),
+        rowHoverColor: style.rowHoverColor,
+        enableRowHoverColor: stateManager.configuration.enableRowHoverColor,
       ),
     );
   }
@@ -220,16 +223,56 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
     required Color cellColorInEditState,
     required Color cellColorInReadOnlyState,
     required PlutoGridSelectingMode selectingMode,
+    required bool isCurrentCell,
+    required bool isSelectedCell,
+    required bool isRowHovered,
+    required Color rowHoverColor,
+    required bool enableRowHoverColor,
   }) {
-    if (!hasFocus) {
-      return gridBackgroundColor;
+    Color color = Colors.transparent;
+
+    /// Applying cell's custom color if it exists (unless editing current cell)
+    if (widget.cell.cellColor != null && !(isCurrentCell && isEditing)) {
+      color = widget.cell.cellColor!;
     }
 
-    if (!isEditing) {
-      return selectingMode.isRow ? activatedColor : null;
+    /// Otherwise applying default grid coloring
+    else {
+      if (isCurrentCell) {
+        if (!hasFocus) {
+          color = gridBackgroundColor;
+        } else if (!isEditing) {
+          color = selectingMode.isRow ? activatedColor : Colors.transparent;
+        } else {
+          color = readOnly ? cellColorInReadOnlyState : cellColorInEditState;
+        }
+      } else if (isSelectedCell) {
+        color = activatedColor;
+      }
     }
 
-    return readOnly == true ? cellColorInReadOnlyState : cellColorInEditState;
+    /// Apply row hover effect - prioritize hover over other states except active editing
+    if (isRowHovered && enableRowHoverColor) {
+      /// Don't apply hover when actively editing
+      if (!(isCurrentCell && isEditing && hasFocus)) {
+        /// Use a more visible approach - blend with higher opacity or replace entirely
+        Color hoverColor = rowHoverColor;
+
+        /// Ensure hover color has sufficient opacity
+        if (hoverColor.a < 0.1) {
+          hoverColor = hoverColor.withValues(alpha: 0.1);
+        }
+
+        if (color == Colors.transparent) {
+          color = hoverColor;
+        } else {
+          /// For non-transparent colors, blend with the hover color
+          color = Color.lerp(color, hoverColor, 0.3) ?? hoverColor;
+        }
+      }
+    }
+
+    return color;
   }
 
   BoxDecoration _boxDecoration({
@@ -249,6 +292,9 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
     required Color cellColorInReadOnlyState,
     required Color? cellColorGroupedRow,
     required PlutoGridSelectingMode selectingMode,
+    required bool isRowHovered,
+    required Color rowHoverColor,
+    required bool enableRowHoverColor,
   }) {
     if (isCurrentCell) {
       return BoxDecoration(
@@ -261,6 +307,11 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
           cellColorInReadOnlyState: cellColorInReadOnlyState,
           cellColorInEditState: cellColorInEditState,
           selectingMode: selectingMode,
+          isCurrentCell: isCurrentCell,
+          isSelectedCell: isSelectedCell,
+          isRowHovered: isRowHovered,
+          rowHoverColor: rowHoverColor,
+          enableRowHoverColor: enableRowHoverColor,
         ),
         border: Border.all(
           color: hasFocus ? activatedBorderColor : inactivatedBorderColor,
@@ -268,16 +319,44 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
         ),
       );
     } else if (isSelectedCell) {
+      Color selectedColor = activatedColor;
+
+      // Apply hover effect to selected cells too
+      if (isRowHovered && enableRowHoverColor) {
+        Color hoverColor = rowHoverColor;
+        if (hoverColor.a < 0.1) {
+          hoverColor = hoverColor.withValues(alpha: 0.1);
+        }
+        selectedColor = Color.lerp(selectedColor, hoverColor, 0.3) ?? hoverColor;
+      }
+
       return BoxDecoration(
-        color: activatedColor,
+        color: selectedColor,
         border: Border.all(
           color: hasFocus ? activatedBorderColor : inactivatedBorderColor,
           width: 1,
         ),
       );
     } else {
+      Color? cellColor = widget.cell.cellColor ??
+          (isGroupedRowCell ? cellColorGroupedRow : null);
+
+      /// Apply hover effect to normal cells
+      if (isRowHovered && enableRowHoverColor) {
+        Color hoverColor = rowHoverColor;
+        if (hoverColor.a < 0.1) {
+          hoverColor = hoverColor.withValues(alpha: 0.1);
+        }
+
+        if (cellColor == null) {
+          cellColor = hoverColor;
+        } else {
+          cellColor = Color.lerp(cellColor, hoverColor, 0.3) ?? hoverColor;
+        }
+      }
+
       return BoxDecoration(
-        color: isGroupedRowCell ? cellColorGroupedRow : null,
+        color: cellColor,
         border: enableCellVerticalBorder
             ? BorderDirectional(
                 end: BorderSide(
@@ -299,6 +378,7 @@ class _CellContainerState extends PlutoStateWithChange<_CellContainer> {
         child: widget.child,
       ),
     );
+
   }
 }
 

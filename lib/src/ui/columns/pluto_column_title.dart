@@ -264,6 +264,103 @@ class _DraggableWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildDragFeedback(BuildContext context) {
+    final column = this.column;
+    final stateManager = this.stateManager;
+    final columnWidth = column.width;
+    final columnHeight = stateManager.columnHeight;
+    final rowHeight = stateManager.rowHeight;
+    final rows = stateManager.refRows;
+    final style = stateManager.configuration.style;
+
+    // Calculate visible rows
+    final maxHeight = MediaQuery.of(context).size.height * 0.8;
+    final visibleRowCount = min(
+      ((maxHeight - columnHeight) / rowHeight).floor(),
+      rows.length,
+    );
+
+    // Pre-build common style elements
+    final borderStyle = BorderSide(
+      color: style.borderColor,
+      width: PlutoGridSettings.rowBorderWidth,
+    );
+    final boxShadow = BoxShadow(
+      color: Colors.black.withValues(alpha: 0.2),
+      blurRadius: 10,
+      spreadRadius: 2,
+      offset: const Offset(0, 4),
+    );
+
+    return Container(
+      width: columnWidth,
+      constraints: BoxConstraints(
+        maxHeight: maxHeight,
+      ),
+      decoration: BoxDecoration(
+        color: style.gridBackgroundColor,
+        border: Border.all(
+          color: style.gridBorderColor,
+          width: 1.0,
+        ),
+        boxShadow: [boxShadow],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          /// Column header
+          Container(
+            height: columnHeight,
+            padding: column.titlePadding ?? style.defaultColumnTitlePadding,
+            decoration: BoxDecoration(
+              color: column.backgroundColor,
+              border: Border(bottom: borderStyle),
+
+            ),
+            alignment: column.titleTextAlign.alignmentValue,
+            child: _ColumnTextWidget(
+              column: column,
+              stateManager: stateManager,
+              height: columnHeight,
+            ),
+          ),
+          /// Visible rows only
+          ListView.builder(///not used separated for drawing lines
+            ///because of better performance with itemExtent property of
+            /// listview builder
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: visibleRowCount,
+            itemExtent: rowHeight,
+            itemBuilder: (context, index) {
+              final row = rows[index];
+              return Container(
+                height: rowHeight,
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: style.borderColor,
+                      width: PlutoGridSettings.rowBorderWidth,
+                    ),
+                  ),
+                ),
+                child: PlutoBaseCell(
+                  key: ValueKey('drag_feedback_${row.key}_${column.key}'),
+                  cell: row.cells[column.field]!,
+                  column: column,
+                  rowIdx: index,
+                  row: row,
+                  stateManager: stateManager,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Listener(
@@ -272,26 +369,7 @@ class _DraggableWidget extends StatelessWidget {
       child: Draggable<PlutoColumn>(
         data: column,
         dragAnchorStrategy: pointerDragAnchorStrategy,
-        feedback: FractionalTranslation(
-          translation: const Offset(-0.5, -0.5),
-          child: PlutoShadowContainer(
-            alignment: column.titleTextAlign.alignmentValue,
-            width: PlutoGridSettings.minColumnWidth,
-            height: stateManager.columnHeight,
-            backgroundColor:
-                stateManager.configuration.style.gridBackgroundColor,
-            borderColor: stateManager.configuration.style.gridBorderColor,
-            child: Text(
-              column.title,
-              style: stateManager.configuration.style.columnTextStyle.copyWith(
-                fontSize: 12,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              softWrap: false,
-            ),
-          ),
-        ),
+        feedback: _buildDragFeedback(context),
         child: child,
       ),
     );

@@ -6,9 +6,10 @@ class AppColors {
   static const Color black = Colors.black;
   static const Color white = Colors.white;
   static const Color successColor = Colors.green;
-  static const Color gridBorderColor = Color(0xFF424242);
+  static const Color gridBorderColor = Color(0xFFDCDFE4);
+  static const Color gridBorderColorDark = Color(0xFF424242);
   static const Color rowHoverColor = Color(0xFFF5F7FA);
-  static const Color rowHoverColorDark = Color(0xFF191A1D);
+  static const Color rowHoverColorDark = Color(0xFF424242);
   static const Color positiveChange = Colors.green;
   static const Color negativeChange = Colors.red;
   static const Color columnTitleTextColor = Color(0xFF626F86);
