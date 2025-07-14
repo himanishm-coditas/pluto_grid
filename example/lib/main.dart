@@ -9,7 +9,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppInjector.setupLocator();
   await AppInjector.getIt<SharedPrefsService>().initSharedPreferences();
-  // Initialize theme controller to load saved preference
   await AppInjector.getIt<ThemeController>().initialize();
   runApp(const MyApp());
 }

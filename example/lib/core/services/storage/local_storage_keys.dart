@@ -1,5 +1,5 @@
 class SharedPrefsKeys {
 
-  static const String themeKey = 'is_dark_theme';
+  static const String themeMode = 'theme_mode';
 
 }

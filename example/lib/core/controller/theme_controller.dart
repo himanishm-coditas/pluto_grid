@@ -1,33 +1,36 @@
-import 'package:example/feature/watchlist/domain/repositories/watchlist_repository.dart';
+import 'package:example/core/services/storage/local_storage_keys.dart';
+import 'package:example/core/services/storage/local_storage_service.dart';
 import 'package:flutter/material.dart';
 
 class ThemeController extends ValueNotifier<ThemeMode> {
-  ThemeController(this._watchlistRepository) : super(ThemeMode.light);
+  ThemeController(this._sharedPrefsService) : super(ThemeMode.system);
 
-  final WatchlistRepository _watchlistRepository;
+  final SharedPrefsService _sharedPrefsService;
 
   Future<void> initialize() async {
-    final bool isDark = _watchlistRepository.loadThemePreference();
-    value = isDark ? ThemeMode.dark : ThemeMode.light;
+    final String? modeName =
+    _sharedPrefsService.getString(SharedPrefsKeys.themeMode);
+
+    if (modeName != null) {
+      value = ThemeMode.values.byName(modeName);
+    } else {
+      value = ThemeMode.system;
+    }
+  }
+
+  Future<void> setTheme(final ThemeMode theme) async {
+    value = theme;
+    await _sharedPrefsService.setString(
+       SharedPrefsKeys.themeMode,
+       theme.name,
+    );
   }
 
   Future<void> toggleTheme() async {
-    final ThemeMode newTheme =
-        value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-    value = newTheme;
-
-    // Save the theme preference
-    await _watchlistRepository.saveThemePreference(
-        isDark: newTheme == ThemeMode.dark);
-  }
-
-  Future<void> setLight() async {
-    value = ThemeMode.light;
-    await _watchlistRepository.saveThemePreference(isDark: false);
-  }
-
-  Future<void> setDark() async {
-    value = ThemeMode.dark;
-    await _watchlistRepository.saveThemePreference(isDark: true);
+    if (value == ThemeMode.light) {
+      await setTheme(ThemeMode.dark);
+    } else  {
+      await setTheme(ThemeMode.light);
+    }
   }
 }

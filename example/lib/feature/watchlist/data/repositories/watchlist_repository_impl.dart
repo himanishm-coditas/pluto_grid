@@ -13,10 +13,4 @@ class WatchlistRepositoryImpl implements WatchlistRepository {
   Future<Either<Failure, List<WatchlistItemEntity>>> getWatchlistItems() =>
       localDataSource.getWatchlistItems();
 
-  @override
-  Future<void> saveThemePreference({required final bool isDark}) =>
-      localDataSource.saveThemePreference(isDark: isDark);
-
-  @override
-  bool loadThemePreference()=>localDataSource.loadThemePreference();
 }

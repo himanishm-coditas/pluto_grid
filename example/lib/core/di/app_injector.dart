@@ -22,7 +22,6 @@ class AppInjector {
       ..registerLazySingleton<WatchlistLocalDataSource>(
         () => WatchlistLocalDataSource(
           jsonService: getIt<JsonService>(),
-          sharedPrefsService: getIt<SharedPrefsService>(),
         ),
       )
       ..registerLazySingleton<WatchlistRepository>(
@@ -41,7 +40,7 @@ class AppInjector {
         ),
       )
       ..registerLazySingleton<ThemeController>(
-            () => ThemeController(getIt<WatchlistRepository>()),
+            () => ThemeController(getIt<SharedPrefsService>()),
       );
   }
 }

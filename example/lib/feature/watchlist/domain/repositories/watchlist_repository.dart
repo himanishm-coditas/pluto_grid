@@ -5,7 +5,4 @@ import 'package:example/feature/watchlist/domain/entities/watchlist_item_entity.
 abstract class WatchlistRepository {
   Future<Either<Failure, List<WatchlistItemEntity>>> getWatchlistItems();
 
-  Future<void> saveThemePreference({required final bool isDark});
-
-  bool loadThemePreference();
 }
