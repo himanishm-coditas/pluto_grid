@@ -126,6 +126,7 @@ example/.dart_tool/
 /build/
 # ignore everything in example/
 example/*
+/demo/
 
 
 # but do NOT ignore lib folder and main.dart
