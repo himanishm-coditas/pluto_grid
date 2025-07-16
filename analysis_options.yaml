@@ -3,3 +3,40 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
     - '**.mocks.dart'
+
+linter:
+  rules:
+    # 👷 Memory & Performance optimizations
+    avoid_unnecessary_containers: true
+    sized_box_for_whitespace: true
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_in_for_each: true
+    use_rethrow_when_possible: true
+
+    # 👷 Widget tree optimizations
+    avoid_unnecessary_stateful_widgets: true
+    avoid_redundant_argument_values: true
+    avoid_returning_null_for_future: true
+    avoid_returning_null: true
+
+    # 👷 Build method hygiene
+    prefer_expression_function_bodies: true
+    prefer_typing_uninitialized_variables: true
+    use_decorated_box: true
+
+    # 👷 Immutable patterns
+    prefer_final_parameters: true
+    prefer_final_locals: true
+    prefer_final_fields: true
+
+    # 👷 Loop and collection optimizations
+    use_setters_to_change_properties: true
+    use_to_and_as_if_applicable: true
+    avoid_function_literals_in_foreach_calls: true
+
+    # 👷 General
+    avoid_init_to_null: true
+    unnecessary_this: true

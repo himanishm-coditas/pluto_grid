@@ -4,10 +4,13 @@ import 'package:pluto_grid/pluto_grid.dart';
 class PlutoRow {
   PlutoRow({
     required this.cells,
-    PlutoRowType? type,
+    final PlutoRowType? type,
     this.sortIdx = 0,
-    bool checked = false,
-    Key? key,
+    final bool checked = false,
+    final Key? key,
+    this.menuChildren,
+    this.menuAnchorChildBuilder,
+    this.menuOptions,
   })  : type = type ?? PlutoRowTypeNormal.instance,
         _checked = checked,
         _state = PlutoRowState.none,
@@ -28,6 +31,14 @@ class PlutoRow {
   PlutoRow? _parent;
 
   PlutoRowState _state;
+
+  /// List of menu items to display when hovering over the row
+  final List<Widget>? menuChildren;
+
+  /// Custom builder for the menu anchor
+  final MenuAnchorChildBuilder? menuAnchorChildBuilder;
+
+  final List<Widget>? menuOptions;
 
   Key get key => _key;
 
@@ -63,9 +74,7 @@ class PlutoRow {
   /// To manually change the values at runtime,
   /// use the PlutoStateManager.setRowChecked
   /// or PlutoStateManager.toggleAllRowChecked methods.
-  bool? get checked {
-    return type.isGroup ? _tristateCheckedRow : _checked;
-  }
+  bool? get checked => type.isGroup ? _tristateCheckedRow : _checked;
 
   bool? get _tristateCheckedRow {
     if (!type.isGroup) return false;
@@ -115,11 +124,15 @@ class PlutoRow {
   /// Make sure it stays in the list unless you change the filtering again.
   PlutoRowState get state => _state;
 
-  void setParent(PlutoRow? row) {
+  /// Returns true if the row has menu functionality enabled and menu items are available
+  bool get hasMenu => ((menuChildren != null && menuChildren!.isNotEmpty) ||
+      (menuOptions != null && menuOptions!.isNotEmpty));
+
+  void setParent(final PlutoRow? row) {
     _parent = row;
   }
 
-  void setChecked(bool? flag) {
+  void setChecked(final bool? flag) {
     _checked = flag;
     if (type.isGroup) {
       for (final child in type.group.children) {
@@ -128,9 +141,26 @@ class PlutoRow {
     }
   }
 
-  void setState(PlutoRowState state) {
+  void setState(final PlutoRowState state) {
     _state = state;
   }
+
+  /// Creating a copy of this row with updated menu configuration
+  PlutoRow copyWithMenu({
+    final List<Widget>? menuChildren,
+    final MenuAnchorChildBuilder? menuAnchorChildBuilder,
+    final List<Widget>? menuOptions,
+  }) => PlutoRow(
+      cells: cells,
+      type: type,
+      sortIdx: sortIdx,
+      checked: _checked ?? false,
+      key: _key,
+      menuChildren: menuChildren ?? this.menuChildren,
+      menuAnchorChildBuilder:
+      menuAnchorChildBuilder ?? this.menuAnchorChildBuilder,
+      menuOptions: menuOptions ?? this.menuOptions,
+    );
 
   /// Create PlutoRow in json type.
   /// The key of the json you want to generate must match the key of [PlutoColumn].
@@ -170,16 +200,19 @@ class PlutoRow {
   /// final rowGroup = PlutoRow.fromJson(json, childrenField: 'children');
   /// ```
   factory PlutoRow.fromJson(
-    Map<String, dynamic> json, {
-    String? childrenField,
-  }) {
+      final Map<String, dynamic> json, {
+        final String? childrenField,
+        final List<Widget>? menuChildren,
+        final MenuAnchorChildBuilder? menuAnchorChildBuilder,
+        final List<Widget>? menuOptions,
+      }) {
     final Map<String, PlutoCell> cells = {};
 
     final bool hasChildren =
         childrenField != null && json.containsKey(childrenField);
 
     final entries = hasChildren
-        ? json.entries.where((e) => e.key != childrenField)
+        ? json.entries.where((final e) => e.key != childrenField)
         : json.entries;
 
     assert(!hasChildren || json.length - 1 == entries.length);
@@ -196,13 +229,25 @@ class PlutoRow {
       final children = <PlutoRow>[];
 
       for (final child in json[childrenField]) {
-        children.add(PlutoRow.fromJson(child, childrenField: childrenField));
+        children.add(PlutoRow.fromJson(
+          child,
+          childrenField: childrenField,
+          menuChildren: menuChildren,
+          menuAnchorChildBuilder: menuAnchorChildBuilder,
+          menuOptions: menuOptions,
+        ));
       }
 
       type = PlutoRowType.group(children: FilteredList(initialList: children));
     }
 
-    return PlutoRow(cells: cells, type: type);
+    return PlutoRow(
+      cells: cells,
+      type: type,
+      menuChildren: menuChildren,
+      menuAnchorChildBuilder: menuAnchorChildBuilder,
+      menuOptions: menuOptions,
+    );
   }
 
   /// Convert the row to json type.
@@ -276,17 +321,17 @@ class PlutoRow {
   /// // }
   /// ```
   Map<String, dynamic> toJson({
-    bool includeChildren = true,
-    String childrenField = 'children',
+    final bool includeChildren = true,
+    final String childrenField = 'children',
   }) {
-    final json = cells.map((key, value) => MapEntry(key, value.value));
+    final json = cells.map((final key, final value) => MapEntry(key, value.value));
 
     if (!includeChildren || !type.isGroup) return json;
 
     final List<Map<String, dynamic>> children = type.group.children
         .map(
-          (e) => e.toJson(childrenField: childrenField),
-        )
+          (final e) => e.toJson(childrenField: childrenField),
+    )
         .toList();
 
     json[childrenField] = children;
