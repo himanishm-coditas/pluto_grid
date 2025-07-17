@@ -128,6 +128,7 @@ example/.dart_tool/
 example/*
 /demo/
 
+
 # but do NOT ignore lib folder and main.dart
 !example/lib/
 # GitHub workflows & configs

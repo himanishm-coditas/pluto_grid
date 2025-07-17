@@ -5,11 +5,12 @@ import 'package:example/feature/watchlist/domain/entities/watchlist_item_entity.
 import 'package:example/feature/watchlist/domain/repositories/watchlist_repository.dart';
 
 class WatchlistRepositoryImpl implements WatchlistRepository {
-
   WatchlistRepositoryImpl({required this.localDataSource});
+
   final WatchlistLocalDataSource localDataSource;
 
   @override
   Future<Either<Failure, List<WatchlistItemEntity>>> getWatchlistItems() =>
       localDataSource.getWatchlistItems();
+
 }

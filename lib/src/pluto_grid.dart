@@ -337,7 +337,7 @@ class PlutoGrid extends PlutoStatefulWidget {
   /// initializeDateFormatting();
   /// ```
   /// {@endtemplate}
-  static setDefaultLocale(String locale) {
+  static setDefaultLocale(final String locale) {
     Intl.defaultLocale = locale;
   }
 
@@ -422,7 +422,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
 
   @override
   void dispose() {
-    for (var dispose in _disposeList) {
+    for (final dispose in _disposeList) {
       dispose();
     }
 
@@ -430,7 +430,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
   }
 
   @override
-  void didUpdateWidget(covariant PlutoGrid oldWidget) {
+  void didUpdateWidget(covariant final PlutoGrid oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     stateManager
@@ -439,7 +439,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
   }
 
   @override
-  void updateState(PlutoNotifierEvent event) {
+  void updateState(final PlutoNotifierEvent event) {
     _showColumnTitle = update<bool>(
       _showColumnTitle,
       stateManager.showColumnTitle,
@@ -562,7 +562,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
   void _initOnLoadedEvent() {
     if (widget.onLoaded == null) return;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((final _) {
       widget.onLoaded!(PlutoGridOnLoadedEvent(stateManager: _stateManager));
     });
   }
@@ -570,7 +570,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
   void _initSelectMode() {
     if (!widget.mode.isSelectMode) return;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((final _) {
       if (_stateManager.currentCell == null) {
         _stateManager.setCurrentCell(_stateManager.firstCell, 0);
       }
@@ -593,7 +593,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
     }
   }
 
-  KeyEventResult _handleGridFocusOnKey(FocusNode focusNode, KeyEvent event) {
+  KeyEventResult _handleGridFocusOnKey(final FocusNode focusNode, final KeyEvent event) {
     if (_keyManager.eventResult.isSkip == false) {
       _keyManager.subject.add(PlutoKeyManagerEvent(
         focusNode: focusNode,
@@ -605,14 +605,13 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FocusScope(
+  Widget build(final BuildContext context) => FocusScope(
       onFocusChange: _stateManager.setKeepFocus,
       onKeyEvent: _handleGridFocusOnKey,
       child: _GridContainer(
         stateManager: _stateManager,
         child: LayoutBuilder(
-          builder: (c, size) {
+          builder: (final c, final size) {
             _stateManager.setLayout(size);
 
             final style = _stateManager.style;
@@ -666,7 +665,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
                     child: PlutoShadowLine(
                       axis: Axis.vertical,
                       color: style.gridBorderColor,
-                      shadow: style.enableGridBorderShadow,
+                      shadow: style.enableLeftFrozenColumnShadow,
                     ),
                   ),
                   if (showColumnFooter)
@@ -690,7 +689,7 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
                     child: PlutoShadowLine(
                       axis: Axis.vertical,
                       color: style.gridBorderColor,
-                      shadow: style.enableGridBorderShadow,
+                      shadow: style.enableRightFrozenColumnShadow,
                       reverse: true,
                     ),
                   ),
@@ -784,7 +783,6 @@ class PlutoGridState extends PlutoStateWithChange<PlutoGrid> {
         ),
       ),
     );
-  }
 }
 
 class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
@@ -799,8 +797,8 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
   }
 
   @override
-  void performLayout(Size size) {
-    bool isLTR = _stateManager.isLTR;
+  void performLayout(final Size size) {
+    final bool isLTR = _stateManager.isLTR;
     double bodyRowsTopOffset = 0;
     double bodyRowsBottomOffset = 0;
     double columnsTopOffset = 0;
@@ -810,7 +808,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
     // first layout header and footer and see what remains for the scrolling part
     if (hasChild(_StackName.header)) {
       // maximum 40% of the height
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.header,
         BoxConstraints.loose(Size(size.width, _safe(size.height / 100 * 40))),
       );
@@ -838,7 +836,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
 
     if (hasChild(_StackName.footer)) {
       // maximum 40% of the height
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.footer,
         BoxConstraints.loose(Size(size.width, _safe(size.height / 100 * 40))),
       );
@@ -869,7 +867,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
 
     // now layout columns of frozen sides and see what remains for the body width
     if (hasChild(_StackName.leftFrozenColumns)) {
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.leftFrozenColumns,
         BoxConstraints.loose(size),
       );
@@ -889,7 +887,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     if (hasChild(_StackName.leftFrozenDivider)) {
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.leftFrozenDivider,
         BoxConstraints.tight(
           Size(
@@ -916,7 +914,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     if (hasChild(_StackName.rightFrozenColumns)) {
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.rightFrozenColumns,
         BoxConstraints.loose(size),
       );
@@ -937,7 +935,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     if (hasChild(_StackName.rightFrozenDivider)) {
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.rightFrozenDivider,
         BoxConstraints.tight(
           Size(
@@ -964,7 +962,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     if (hasChild(_StackName.bodyColumns)) {
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.bodyColumns,
         BoxConstraints.loose(
           Size(
@@ -986,7 +984,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     if (hasChild(_StackName.bodyColumnFooters)) {
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.bodyColumnFooters,
         BoxConstraints.loose(
           Size(
@@ -1010,7 +1008,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     if (hasChild(_StackName.columnFooterDivider)) {
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.columnFooterDivider,
         BoxConstraints.tight(
           Size(size.width, PlutoGridSettings.gridBorderWidth),
@@ -1025,7 +1023,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
 
     // layout rows
     if (hasChild(_StackName.columnRowDivider)) {
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.columnRowDivider,
         BoxConstraints.tight(
           Size(size.width, PlutoGridSettings.gridBorderWidth),
@@ -1107,7 +1105,7 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
 
     if (hasChild(_StackName.rightFrozenColumnFooters)) {
       final double offset = isLTR ? bodyRightOffset : bodyLeftOffset;
-      var s = layoutChild(
+      final s = layoutChild(
         _StackName.rightFrozenColumnFooters,
         BoxConstraints.loose(Size(offset, size.height)),
       );
@@ -1189,11 +1187,9 @@ class PlutoGridLayoutDelegate extends MultiChildLayoutDelegate {
   }
 
   @override
-  bool shouldRelayout(covariant PlutoGridLayoutDelegate oldDelegate) {
-    return true;
-  }
+  bool shouldRelayout(covariant final PlutoGridLayoutDelegate oldDelegate) => true;
 
-  double _safe(double value) => max(0, value);
+  double _safe(final double value) => max(0, value);
 }
 
 class _GridContainer extends StatelessWidget {
@@ -1207,7 +1203,7 @@ class _GridContainer extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final style = stateManager.style;
 
     final borderRadius = style.gridBorderRadius.resolve(TextDirection.ltr);
@@ -1225,7 +1221,6 @@ class _GridContainer extends StatelessWidget {
             borderRadius: style.gridBorderRadius,
             border: Border.all(
               color: style.gridBorderColor,
-              width: PlutoGridSettings.gridBorderWidth,
             ),
           ),
           child: Padding(
@@ -1312,9 +1307,7 @@ class PlutoGridOnSelectedEvent {
   });
 
   @override
-  String toString() {
-    return '[PlutoGridOnSelectedEvent] rowIdx: $rowIdx, selectedRows: ${selectedRows?.length}';
-  }
+  String toString() => '[PlutoGridOnSelectedEvent] rowIdx: $rowIdx, selectedRows: ${selectedRows?.length}';
 }
 
 /// Argument of [PlutoGrid.onSorted] callback for receiving column sort change event.
@@ -1329,9 +1322,7 @@ class PlutoGridOnSortedEvent {
   });
 
   @override
-  String toString() {
-    return '[PlutoGridOnSortedEvent] ${column.title} (changed: ${column.sort}, old: $oldSort)';
-  }
+  String toString() => '[PlutoGridOnSortedEvent] ${column.title} (changed: ${column.sort}, old: $oldSort)';
 }
 
 /// Argument of [PlutoGrid.onRowChecked] callback to receive row checkbox event.
@@ -1448,7 +1439,7 @@ class PlutoGridOnColumnsMovedEvent {
     String text =
         '[PlutoGridOnColumnsMovedEvent] idx: $idx, visualIdx: $visualIdx\n';
 
-    text += columns.map((e) => e.title).join(',');
+    text += columns.map((final e) => e.title).join(',');
 
     return text;
   }
@@ -1474,7 +1465,7 @@ class PlutoRowColorContext {
 class PlutoScrollBehavior extends MaterialScrollBehavior {
   const PlutoScrollBehavior({
     required this.isMobile,
-    Set<PointerDeviceKind>? userDragDevices,
+    final Set<PointerDeviceKind>? userDragDevices,
   })  : _dragDevices = userDragDevices ??
             (isMobile ? _mobileDragDevices : _desktopDragDevices),
         super();
@@ -1501,12 +1492,10 @@ class PlutoScrollBehavior extends MaterialScrollBehavior {
 
   @override
   Widget buildScrollbar(
-    BuildContext context,
-    Widget child,
-    ScrollableDetails details,
-  ) {
-    return child;
-  }
+    final BuildContext context,
+    final Widget child,
+    final ScrollableDetails details,
+  ) => child;
 }
 
 /// A class for changing the value of a nullable property in a method such as [copyWith].

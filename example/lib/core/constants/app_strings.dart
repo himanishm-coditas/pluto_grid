@@ -9,13 +9,16 @@ class AppStrings {
   static const String unknownError = 'Unknown error occurred';
   static const String symbol = 'Symbol';
   static const String company = 'Company';
-  static const String bidQty = 'Bid Qty';
-  static const String bidRate = 'Bid Rate';
-  static const String askQty = 'Ask Qty';
-  static const String askRate = 'Ask Rate';
-  static const String volume = 'Volume';
-  static const String high52w = '52W High';
-  static const String low52w = '52W Low';
+  static const String bidQty = 'Bid qty';
+  static const String bidRate = 'Bid rate';
+  static const String askQty = 'Ask qty';
+  static const String askRate = 'Ask rate';
+  static const String volume = 'Volume traded today';
+  static const String high52w = 'High';
+  static const String low52w = 'Low';
+  static const String open = 'Open';
   static const String ltp = 'LTP';
-  static const String change = 'Change';
+  static const String atp = 'ATP';
+  static const String change = 'Net change';
+  static const String previousClose = 'Prev close ';
 }

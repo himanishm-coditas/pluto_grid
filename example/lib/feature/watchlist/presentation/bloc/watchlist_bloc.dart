@@ -18,15 +18,15 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
   final WatchlistUsecase watchlistUsecase;
 
   Future<void> _onLoadWatchlist(
-    final LoadWatchlistEvent event,
-    final Emitter<WatchlistState> emit,
-  ) async {
+      final LoadWatchlistEvent event,
+      final Emitter<WatchlistState> emit,
+      ) async {
     emit(WatchlistInitial());
     final Either<Failure, List<WatchlistItemEntity>> result =
-        await watchlistUsecase.getWatchlistItems();
+    await watchlistUsecase.getWatchlistItems();
     result.fold(
-      (final Failure failure) => emit(WatchlistError(failure.message)),
-      (final List<WatchlistItemEntity> items) => emit(WatchlistLoaded(items)),
+          (final Failure failure) => emit(WatchlistError(failure.message)),
+          (final List<WatchlistItemEntity> items) => emit(WatchlistLoaded(items)),
     );
   }
 }

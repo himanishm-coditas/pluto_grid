@@ -117,15 +117,15 @@ class PlutoGridConfiguration {
   }
 
   /// Fired when setConfiguration is called in [PlutoGridStateManager]'s constructor.
-  void applyColumnFilter(List<PlutoColumn>? refColumns) {
+  void applyColumnFilter(final List<PlutoColumn>? refColumns) {
     if (refColumns == null || refColumns.isEmpty) {
       return;
     }
 
-    var len = refColumns.length;
+    final len = refColumns.length;
 
     for (var i = 0; i < len; i += 1) {
-      var column = refColumns[i];
+      final column = refColumns[i];
 
       column.setDefaultFilter(
         columnFilter.getDefaultColumnFilter(column),
@@ -134,18 +134,17 @@ class PlutoGridConfiguration {
   }
 
   PlutoGridConfiguration copyWith(
-      {bool? enableMoveDownAfterSelecting,
-        bool? enableMoveHorizontalInEditing,
-        PlutoGridEnterKeyAction? enterKeyAction,
-        PlutoGridTabKeyAction? tabKeyAction,
-        PlutoGridShortcut? shortcut,
-        PlutoGridStyleConfig? style,
-        PlutoGridScrollbarConfig? scrollbar,
-        PlutoGridColumnFilterConfig? columnFilter,
-        PlutoGridColumnSizeConfig? columnSize,
-        PlutoGridLocaleText? localeText,
-        bool? enableRowHoverColor}) {
-    return PlutoGridConfiguration(
+      {final bool? enableMoveDownAfterSelecting,
+        final bool? enableMoveHorizontalInEditing,
+        final PlutoGridEnterKeyAction? enterKeyAction,
+        final PlutoGridTabKeyAction? tabKeyAction,
+        final PlutoGridShortcut? shortcut,
+        final PlutoGridStyleConfig? style,
+        final PlutoGridScrollbarConfig? scrollbar,
+        final PlutoGridColumnFilterConfig? columnFilter,
+        final PlutoGridColumnSizeConfig? columnSize,
+        final PlutoGridLocaleText? localeText,
+        final bool? enableRowHoverColor}) => PlutoGridConfiguration(
       enableMoveDownAfterSelecting:
       enableMoveDownAfterSelecting ?? this.enableMoveDownAfterSelecting,
       enableMoveHorizontalInEditing:
@@ -160,11 +159,9 @@ class PlutoGridConfiguration {
       localeText: localeText ?? this.localeText,
       enableRowHoverColor: enableRowHoverColor ?? this.enableRowHoverColor,
     );
-  }
 
   @override
-  bool operator ==(covariant Object other) {
-    return identical(this, other) ||
+  bool operator ==(covariant final Object other) => identical(this, other) ||
         other is PlutoGridConfiguration &&
             runtimeType == other.runtimeType &&
             enableMoveDownAfterSelecting ==
@@ -179,7 +176,6 @@ class PlutoGridConfiguration {
             columnFilter == other.columnFilter &&
             columnSize == other.columnSize &&
             localeText == other.localeText;
-  }
 
   @override
   int get hashCode => Object.hash(
@@ -205,6 +201,8 @@ class PlutoGridStyleConfig {
     this.selectedRowBorderColor = const Color(0xFF2196F3),
     this.rowHoverColor = const Color(0x10000000),
     this.enableGridBorderShadow = false,
+    this.enableLeftFrozenColumnShadow = false,
+    this.enableRightFrozenColumnShadow = false,
     this.enableColumnBorderVertical = true,
     this.enableColumnBorderHorizontal = true,
     this.enableCellBorderVertical = true,
@@ -267,6 +265,8 @@ class PlutoGridStyleConfig {
     this.selectedRowBorderColor = const Color(0xFF2196F3), // Light blue default
     this.rowHoverColor = const Color(0x10000000),
     this.enableGridBorderShadow = false,
+    this.enableLeftFrozenColumnShadow = false,
+    this.enableRightFrozenColumnShadow = false,
     this.enableColumnBorderVertical = true,
     this.enableColumnBorderHorizontal = true,
     this.enableCellBorderVertical = true,
@@ -332,6 +332,12 @@ class PlutoGridStyleConfig {
 
   /// Enable borderShadow in [PlutoGrid].
   final bool enableGridBorderShadow;
+
+  /// Enable shadow in left frozen columns .
+  final bool enableLeftFrozenColumnShadow;
+
+  /// Enable shadow in left frozen columns.
+  final bool enableRightFrozenColumnShadow;
 
   final bool enableSelectedRowBorder;
 
@@ -483,54 +489,55 @@ class PlutoGridStyleConfig {
   final BorderRadiusGeometry gridPopupBorderRadius;
 
   PlutoGridStyleConfig copyWith({
-    bool? enableSelectedRowBorder,
-    Color? selectedRowBorderColor,
-    bool? enableGridBorderShadow,
-    bool? enableColumnBorderVertical,
-    bool? enableColumnBorderHorizontal,
-    bool? enableCellBorderVertical,
-    bool? enableCellBorderHorizontal,
-    bool? enableRowColorAnimation,
-    Color? gridBackgroundColor,
-    Color? rowColor,
-    PlutoOptional<Color?>? oddRowColor,
-    PlutoOptional<Color?>? evenRowColor,
-    Color? activatedColor,
-    Color? checkedColor,
-    Color? cellColorInEditState,
-    Color? cellColorInReadOnlyState,
-    PlutoOptional<Color?>? cellColorGroupedRow,
-    Color? dragTargetColumnColor,
-    Color? iconColor,
-    Color? disabledIconColor,
-    Color? menuBackgroundColor,
-    Color? gridBorderColor,
-    Color? borderColor,
-    Color? activatedBorderColor,
-    Color? inactivatedBorderColor,
-    double? iconSize,
-    double? rowHeight,
-    double? columnHeight,
-    double? columnFilterHeight,
-    EdgeInsets? defaultColumnTitlePadding,
-    EdgeInsets? defaultColumnFilterPadding,
-    EdgeInsets? defaultCellPadding,
-    TextStyle? columnTextStyle,
-    TextStyle? cellTextStyle,
-    IconData? columnContextIcon,
-    IconData? columnResizeIcon,
-    PlutoOptional<Icon?>? columnAscendingIcon,
-    PlutoOptional<Icon?>? columnDescendingIcon,
-    IconData? rowGroupExpandedIcon,
-    IconData? rowGroupCollapsedIcon,
-    IconData? rowGroupEmptyIcon,
-    BorderRadiusGeometry? gridBorderRadius,
-    BorderRadiusGeometry? gridPopupBorderRadius,
-    Color? dragTargetIndicatorColor,
-    double? dragTargetIndicatorThickness,
-    EdgeInsets? dragTargetIndicatorPadding,
-  }) {
-    return PlutoGridStyleConfig(
+    final bool? enableSelectedRowBorder,
+    final Color? selectedRowBorderColor,
+    final bool? enableGridBorderShadow,
+    final bool?  enableLeftFrozenColumnShadow,
+    final bool?  enableRightFrozenColumnShadow,
+    final bool? enableColumnBorderVertical,
+    final bool? enableColumnBorderHorizontal,
+    final bool? enableCellBorderVertical,
+    final bool? enableCellBorderHorizontal,
+    final bool? enableRowColorAnimation,
+    final Color? gridBackgroundColor,
+    final Color? rowColor,
+    final PlutoOptional<Color?>? oddRowColor,
+    final PlutoOptional<Color?>? evenRowColor,
+    final Color? activatedColor,
+    final Color? checkedColor,
+    final Color? cellColorInEditState,
+    final Color? cellColorInReadOnlyState,
+    final PlutoOptional<Color?>? cellColorGroupedRow,
+    final Color? dragTargetColumnColor,
+    final Color? iconColor,
+    final Color? disabledIconColor,
+    final Color? menuBackgroundColor,
+    final Color? gridBorderColor,
+    final Color? borderColor,
+    final Color? activatedBorderColor,
+    final Color? inactivatedBorderColor,
+    final double? iconSize,
+    final double? rowHeight,
+    final double? columnHeight,
+    final double? columnFilterHeight,
+    final EdgeInsets? defaultColumnTitlePadding,
+    final EdgeInsets? defaultColumnFilterPadding,
+    final EdgeInsets? defaultCellPadding,
+    final TextStyle? columnTextStyle,
+    final TextStyle? cellTextStyle,
+    final IconData? columnContextIcon,
+    final IconData? columnResizeIcon,
+    final PlutoOptional<Icon?>? columnAscendingIcon,
+    final PlutoOptional<Icon?>? columnDescendingIcon,
+    final IconData? rowGroupExpandedIcon,
+    final IconData? rowGroupCollapsedIcon,
+    final IconData? rowGroupEmptyIcon,
+    final BorderRadiusGeometry? gridBorderRadius,
+    final BorderRadiusGeometry? gridPopupBorderRadius,
+    final Color? dragTargetIndicatorColor,
+    final double? dragTargetIndicatorThickness,
+    final EdgeInsets? dragTargetIndicatorPadding,
+  }) => PlutoGridStyleConfig(
       dragTargetIndicatorColor:
       dragTargetIndicatorColor ?? this.dragTargetIndicatorColor,
       dragTargetIndicatorThickness:
@@ -543,6 +550,10 @@ class PlutoGridStyleConfig {
       enableSelectedRowBorder ?? this.enableSelectedRowBorder,
       enableGridBorderShadow:
       enableGridBorderShadow ?? this.enableGridBorderShadow,
+      enableLeftFrozenColumnShadow:
+      enableLeftFrozenColumnShadow ?? this.enableLeftFrozenColumnShadow,
+      enableRightFrozenColumnShadow:
+      enableRightFrozenColumnShadow ?? this.enableRightFrozenColumnShadow,
       enableColumnBorderVertical:
       enableColumnBorderVertical ?? this.enableColumnBorderVertical,
       enableColumnBorderHorizontal:
@@ -603,14 +614,14 @@ class PlutoGridStyleConfig {
       gridPopupBorderRadius:
       gridPopupBorderRadius ?? this.gridPopupBorderRadius,
     );
-  }
 
   @override
-  bool operator ==(covariant Object other) {
-    return identical(this, other) ||
+  bool operator ==(covariant final Object other) => identical(this, other) ||
         other is PlutoGridStyleConfig &&
             runtimeType == other.runtimeType &&
             enableGridBorderShadow == other.enableGridBorderShadow &&
+            enableLeftFrozenColumnShadow == other.enableLeftFrozenColumnShadow &&
+            enableRightFrozenColumnShadow == other.enableRightFrozenColumnShadow &&
             enableColumnBorderVertical == other.enableColumnBorderVertical &&
             enableColumnBorderHorizontal ==
                 other.enableColumnBorderHorizontal &&
@@ -658,7 +669,6 @@ class PlutoGridStyleConfig {
             dragTargetIndicatorThickness ==
                 other.dragTargetIndicatorThickness &&
             dragTargetIndicatorPadding == other.dragTargetIndicatorPadding;
-  }
 
   @override
   int get hashCode => Object.hashAll([
@@ -668,6 +678,8 @@ class PlutoGridStyleConfig {
     selectedRowBorderColor,
     enableSelectedRowBorder,
     enableGridBorderShadow,
+    enableLeftFrozenColumnShadow,
+    enableRightFrozenColumnShadow,
     enableColumnBorderVertical,
     enableColumnBorderHorizontal,
     enableCellBorderVertical,
@@ -776,8 +788,7 @@ class PlutoGridScrollbarConfig {
   final Set<PointerDeviceKind>? dragDevices;
 
   @override
-  bool operator ==(covariant Object other) {
-    return identical(this, other) ||
+  bool operator ==(covariant final Object other) => identical(this, other) ||
         other is PlutoGridScrollbarConfig &&
             runtimeType == other.runtimeType &&
             draggableScrollbar == other.draggableScrollbar &&
@@ -797,7 +808,6 @@ class PlutoGridScrollbarConfig {
                 other.scrollbarRadiusWhileDragging &&
             longPressDuration == other.longPressDuration &&
             dragDevices == other.dragDevices;
-  }
 
   @override
   int get hashCode => Object.hash(
@@ -876,9 +886,9 @@ class PlutoGridColumnFilterConfig {
   /// }
   /// ```
   const PlutoGridColumnFilterConfig({
-    List<PlutoFilterType>? filters,
-    PlutoGridResolveDefaultColumnFilter? resolveDefaultColumnFilter,
-    int? debounceMilliseconds,
+    final List<PlutoFilterType>? filters,
+    final PlutoGridResolveDefaultColumnFilter? resolveDefaultColumnFilter,
+    final int? debounceMilliseconds,
   })  : _userFilters = filters,
         _userResolveDefaultColumnFilter = resolveDefaultColumnFilter,
         _debounceMilliseconds = debounceMilliseconds == null
@@ -900,19 +910,17 @@ class PlutoGridColumnFilterConfig {
 
   int get debounceMilliseconds => _debounceMilliseconds;
 
-  PlutoFilterType resolver<T>() {
-    return filters.firstWhereOrNull(
-          (element) => element.runtimeType == T,
+  PlutoFilterType resolver<T>() => filters.firstWhereOrNull(
+          (final element) => element.runtimeType == T,
     ) ??
         filters.first;
-  }
 
-  PlutoFilterType getDefaultColumnFilter(PlutoColumn column) {
+  PlutoFilterType getDefaultColumnFilter(final PlutoColumn column) {
     if (_userResolveDefaultColumnFilter == null) {
       return filters.first;
     }
 
-    var resolvedFilter = _userResolveDefaultColumnFilter!(column, resolver);
+    final resolvedFilter = _userResolveDefaultColumnFilter!(column, resolver);
 
     assert(filters.contains(resolvedFilter));
 
@@ -920,15 +928,13 @@ class PlutoGridColumnFilterConfig {
   }
 
   @override
-  bool operator ==(covariant Object other) {
-    return identical(this, other) ||
+  bool operator ==(covariant final Object other) => identical(this, other) ||
         other is PlutoGridColumnFilterConfig &&
             runtimeType == other.runtimeType &&
             listEquals(_userFilters, other._userFilters) &&
             _userResolveDefaultColumnFilter ==
                 other._userResolveDefaultColumnFilter &&
             _debounceMilliseconds == other._debounceMilliseconds;
-  }
 
   @override
   int get hashCode => Object.hash(
@@ -982,15 +988,14 @@ class PlutoGridColumnSizeConfig {
   final bool restoreAutoSizeAfterRemoveColumn;
 
   PlutoGridColumnSizeConfig copyWith({
-    PlutoAutoSizeMode? autoSizeMode,
-    PlutoResizeMode? resizeMode,
-    bool? restoreAutoSizeAfterHideColumn,
-    bool? restoreAutoSizeAfterFrozenColumn,
-    bool? restoreAutoSizeAfterMoveColumn,
-    bool? restoreAutoSizeAfterInsertColumn,
-    bool? restoreAutoSizeAfterRemoveColumn,
-  }) {
-    return PlutoGridColumnSizeConfig(
+    final PlutoAutoSizeMode? autoSizeMode,
+    final PlutoResizeMode? resizeMode,
+    final bool? restoreAutoSizeAfterHideColumn,
+    final bool? restoreAutoSizeAfterFrozenColumn,
+    final bool? restoreAutoSizeAfterMoveColumn,
+    final bool? restoreAutoSizeAfterInsertColumn,
+    final bool? restoreAutoSizeAfterRemoveColumn,
+  }) => PlutoGridColumnSizeConfig(
       autoSizeMode: autoSizeMode ?? this.autoSizeMode,
       resizeMode: resizeMode ?? this.resizeMode,
       restoreAutoSizeAfterHideColumn:
@@ -1004,11 +1009,9 @@ class PlutoGridColumnSizeConfig {
       restoreAutoSizeAfterRemoveColumn: restoreAutoSizeAfterRemoveColumn ??
           this.restoreAutoSizeAfterRemoveColumn,
     );
-  }
 
   @override
-  bool operator ==(covariant Object other) {
-    return identical(this, other) ||
+  bool operator ==(covariant final Object other) => identical(this, other) ||
         other is PlutoGridColumnSizeConfig &&
             runtimeType == other.runtimeType &&
             autoSizeMode == other.autoSizeMode &&
@@ -1023,7 +1026,6 @@ class PlutoGridColumnSizeConfig {
                 other.restoreAutoSizeAfterInsertColumn &&
             restoreAutoSizeAfterRemoveColumn ==
                 other.restoreAutoSizeAfterRemoveColumn;
-  }
 
   @override
   int get hashCode => Object.hash(
@@ -1642,8 +1644,7 @@ class PlutoGridLocaleText {
   });
 
   @override
-  bool operator ==(covariant Object other) {
-    return identical(this, other) ||
+  bool operator ==(covariant final Object other) => identical(this, other) ||
         other is PlutoGridLocaleText &&
             runtimeType == other.runtimeType &&
             unfreezeColumn == other.unfreezeColumn &&
@@ -1677,7 +1678,6 @@ class PlutoGridLocaleText {
             hour == other.hour &&
             minute == other.minute &&
             loadingText == other.loadingText;
-  }
 
   @override
   int get hashCode => Object.hashAll([

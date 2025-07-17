@@ -6,9 +6,12 @@ import 'package:example/core/services/local_json_service.dart';
 import 'package:example/feature/watchlist/data/models/watchlist_item_model.dart';
 
 class WatchlistLocalDataSource {
-  WatchlistLocalDataSource({required this.jsonService});
+  WatchlistLocalDataSource({
+    required this.jsonService,
+  });
 
   final JsonService jsonService;
+
 
   Future<Either<Failure, List<WatchlistItemModel>>> getWatchlistItems() async {
     final Either<Failure, List<WatchlistItemModel>> result =
@@ -22,4 +25,5 @@ class WatchlistLocalDataSource {
     );
     return result;
   }
+
 }

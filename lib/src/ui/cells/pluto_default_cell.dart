@@ -89,7 +89,7 @@ class _PlutoDefaultCellState extends PlutoStateWithChange<PlutoDefaultCell> {
   }
 
   @override
-  void updateState(PlutoNotifierEvent event) {
+  void updateState(final PlutoNotifierEvent event) {
     _hasFocus = update<bool>(
       _hasFocus,
       stateManager.hasFocus,
@@ -118,7 +118,7 @@ class _PlutoDefaultCellState extends PlutoStateWithChange<PlutoDefaultCell> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final cellWidget = _DefaultCellWidget(
       stateManager: stateManager,
       rowIdx: widget.rowIdx,
@@ -132,7 +132,7 @@ class _PlutoDefaultCellState extends PlutoStateWithChange<PlutoDefaultCell> {
     Widget? spacingWidget;
     if (_showSpacing) {
       if (widget.row.depth > 0) {
-        double gap = style.iconSize * 1.5;
+        final double gap = style.iconSize * 1.5;
         double spacing = widget.row.depth * gap;
         if (!widget.row.type.isGroup) spacing += gap;
         spacingWidget = SizedBox(width: spacing);
@@ -164,7 +164,7 @@ class _PlutoDefaultCellState extends PlutoStateWithChange<PlutoDefaultCell> {
     }
 
     return Row(children: [
-      if (_canRowDrag)
+      if (_canRowDrag && widget.stateManager.isRowHovered(widget.row))
         _RowDragIconWidget(
           column: widget.column,
           row: widget.row,
@@ -221,6 +221,8 @@ class _RowDragIconWidget extends StatelessWidget {
     required this.feedbackWidget,
   });
 
+  double get rowHeight => stateManager.rowHeight;
+
   List<PlutoRow> get _draggingRows {
     if (stateManager.currentSelectingRows.isEmpty) {
       return [row];
@@ -238,76 +240,71 @@ class _RowDragIconWidget extends StatelessWidget {
     return [row];
   }
 
-  void _handleOnPointerDown(PointerDownEvent event) {
-    stateManager.setIsDraggingRow(true, notify: false);
+  Widget _buildRowFeedback() {
+    final style = stateManager.configuration.style;
+    final visibleColumns = stateManager.columns.where((final e) => !e.hide).toList();
+    /// Calculate total width of visible columns without it unbouded width error
+    final totalWidth = visibleColumns.fold<double>(0.0, (final sum, final column) {
+      final columnWidth = column.width;
+      return sum + columnWidth;
+    });
+    return SizedBox(
+      width: totalWidth,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: style.gridBackgroundColor,
 
-    stateManager.setDragRows(_draggingRows);
-  }
-
-  void _handleOnPointerMove(PointerMoveEvent event) {
-    // Do not drag while rows are selected.
-    if (stateManager.isSelecting) {
-      stateManager.setIsDraggingRow(false);
-
-      return;
-    }
-
-    stateManager.eventManager!.addEvent(PlutoGridScrollUpdateEvent(
-      offset: event.position,
-    ));
-
-    int? targetRowIdx = stateManager.getRowIdxByOffset(
-      event.position.dy,
-    );
-
-    stateManager.setDragTargetRowIdx(targetRowIdx);
-  }
-
-  void _handleOnPointerUp(PointerUpEvent event) {
-    stateManager.setIsDraggingRow(false);
-
-    PlutoGridScrollUpdateEvent.stopScroll(
-      stateManager,
-      PlutoGridScrollUpdateDirection.all,
+        ),
+        child: Row(
+          children: visibleColumns.map((final column) {
+            final cell = row.cells[column.field]!;
+            return SizedBox(
+              width: column.width,
+              height: rowHeight,
+              child: PlutoDefaultCell(
+                cell: cell,
+                column: column,
+                rowIdx: rowIdx,
+                row: row,
+                stateManager: stateManager,
+              ),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    final translationX = stateManager.isRTL ? -0.92 : -0.08;
-
-    return Listener(
-      onPointerDown: _handleOnPointerDown,
-      onPointerMove: _handleOnPointerMove,
-      onPointerUp: _handleOnPointerUp,
-      child: Draggable<PlutoRow>(
-        data: row,
-        dragAnchorStrategy: pointerDragAnchorStrategy,
-        feedback: FractionalTranslation(
-          translation: Offset(translationX, -0.5),
-          child: Material(
-            child: PlutoShadowContainer(
-              width: column.width,
-              height: stateManager.rowHeight,
-              backgroundColor:
-                  stateManager.configuration.style.gridBackgroundColor,
-              borderColor:
-                  stateManager.configuration.style.activatedBorderColor,
-              child: Row(
-                children: [
-                  dragIcon,
-                  Expanded(
-                    child: feedbackWidget,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+  Widget build(final BuildContext context) => Draggable<PlutoRow>(
+      data: row,
+    dragAnchorStrategy: (final draggable, final context, final position) {
+      final anchor = childDragAnchorStrategy(draggable, context, position);
+      return Offset(anchor.dx, rowHeight / 2);
+    },
+      feedback: _buildRowFeedback(),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.grab,
         child: dragIcon,
       ),
+      onDragStarted: () {
+        stateManager.setIsDraggingRow(true);
+        stateManager.setDragRows(_draggingRows);
+      },
+      onDragEnd: (final details) {
+        stateManager.setIsDraggingRow(false);
+        stateManager.setDragTargetRowIdx(null);
+        stateManager.setDragRows([]);
+      },
+      onDragUpdate: (final details) {
+        final offset = details.globalPosition;
+        stateManager.eventManager!.addEvent(PlutoGridScrollUpdateEvent(
+          offset: offset,
+        ));
+        final int? targetRowIdx = stateManager.getRowIdxByOffset(offset.dy);
+        stateManager.setDragTargetRowIdx(targetRowIdx);
+      },
     );
-  }
 }
 
 class CheckboxSelectionWidget extends PlutoStatefulWidget {
@@ -348,7 +345,7 @@ class CheckboxSelectionWidgetState
   }
 
   @override
-  void updateState(PlutoNotifierEvent event) {
+  void updateState(final PlutoNotifierEvent event) {
     _tristate = update<bool>(
       _tristate,
       stateManager.enabledRowGroups && widget.row.type.isGroup,
@@ -391,8 +388,7 @@ class CheckboxSelectionWidgetState
   }
 
   @override
-  Widget build(BuildContext context) {
-    return PlutoScaledCheckbox(
+  Widget build(final BuildContext context) => PlutoScaledCheckbox(
       value: _checked,
       handleOnChanged: _handleOnChanged,
       tristate: _tristate,
@@ -401,7 +397,6 @@ class CheckboxSelectionWidgetState
       activeColor: stateManager.configuration.style.activatedBorderColor,
       checkColor: stateManager.configuration.style.activatedColor,
     );
-  }
 }
 
 class _DefaultCellWidget extends StatelessWidget {
@@ -450,17 +445,27 @@ class _DefaultCellWidget extends StatelessWidget {
 
     return column.formattedValueForDisplay(cellValue);
   }
-
-  @override
-  Widget build(BuildContext context) {
-    if (column.hasRenderer) {
-      return column.renderer!(PlutoColumnRendererContext(
-        column: column,
-        rowIdx: rowIdx,
-        row: row,
-        cell: cell,
-        stateManager: stateManager,
-      ));
+  Widget _buildMainContent() {
+    if (cell.widget != null && cell.value != null) {
+      return Row(
+        spacing: 8,
+        children: [
+          Expanded(
+            child: Text(
+              _text,
+              style: stateManager.configuration.style.cellTextStyle.copyWith(
+                decoration: TextDecoration.none,
+                fontWeight: FontWeight.normal,
+              ),
+              overflow: TextOverflow.ellipsis,
+              textAlign: column.textAlign.value,
+            ),
+          ),
+          cell.widget!,
+        ],
+      );
+    } else if (cell.widget != null) {
+      return cell.widget!;
     }
 
     return Text(
@@ -472,5 +477,18 @@ class _DefaultCellWidget extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       textAlign: column.textAlign.value,
     );
+  }
+  @override
+  Widget build(final BuildContext context) {
+    if (column.hasRenderer) {
+      return column.renderer!(PlutoColumnRendererContext(
+        column: column,
+        rowIdx: rowIdx,
+        row: row,
+        cell: cell,
+        stateManager: stateManager,
+      ));
+    }
+    return _buildMainContent();
   }
 }
