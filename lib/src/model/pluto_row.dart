@@ -11,6 +11,10 @@ class PlutoRow {
     this.menuChildren,
     this.menuAnchorChildBuilder,
     this.menuOptions,
+    this.menuChildrenStyle,
+    this.menuOptionsStyle,
+    this.menuOptionsButtonStyle,
+    this.menuChildrenSpacing
   })  : type = type ?? PlutoRowTypeNormal.instance,
         _checked = checked,
         _state = PlutoRowState.none,
@@ -34,6 +38,11 @@ class PlutoRow {
 
   /// List of menu items to display when hovering over the row
   final List<Widget>? menuChildren;
+
+  final MenuStyle? menuChildrenStyle;
+  final MenuStyle? menuOptionsStyle;
+  final ButtonStyle? menuOptionsButtonStyle;
+  final double? menuChildrenSpacing;
 
   /// Custom builder for the menu anchor
   final MenuAnchorChildBuilder? menuAnchorChildBuilder;
@@ -148,8 +157,12 @@ class PlutoRow {
   /// Creating a copy of this row with updated menu configuration
   PlutoRow copyWithMenu({
     final List<Widget>? menuChildren,
+    final MenuStyle? menuChildrenStyle,
+    final MenuStyle? menuOptionsStyle,
+    final ButtonStyle? menuOptionsButtonStyle,
     final MenuAnchorChildBuilder? menuAnchorChildBuilder,
     final List<Widget>? menuOptions,
+    final double? menuChildrenSpacing,
   }) => PlutoRow(
       cells: cells,
       type: type,
@@ -157,6 +170,10 @@ class PlutoRow {
       checked: _checked ?? false,
       key: _key,
       menuChildren: menuChildren ?? this.menuChildren,
+    menuChildrenSpacing: menuChildrenSpacing ?? this.menuChildrenSpacing,
+      menuChildrenStyle: menuChildrenStyle ?? this.menuChildrenStyle,
+    menuOptionsStyle: menuOptionsStyle ?? this.menuOptionsStyle,
+    menuOptionsButtonStyle: menuOptionsButtonStyle ?? this.menuOptionsButtonStyle,
       menuAnchorChildBuilder:
       menuAnchorChildBuilder ?? this.menuAnchorChildBuilder,
       menuOptions: menuOptions ?? this.menuOptions,
@@ -203,6 +220,10 @@ class PlutoRow {
       final Map<String, dynamic> json, {
         final String? childrenField,
         final List<Widget>? menuChildren,
+        final double? menuChildrenSpacing,
+        final MenuStyle? menuChildrenStyle,
+        final MenuStyle? menuOptionsStyle,
+        final ButtonStyle? menuOptionsButtonStyle,
         final MenuAnchorChildBuilder? menuAnchorChildBuilder,
         final List<Widget>? menuOptions,
       }) {
@@ -233,6 +254,10 @@ class PlutoRow {
           child,
           childrenField: childrenField,
           menuChildren: menuChildren,
+          menuChildrenSpacing: menuChildrenSpacing,
+          menuChildrenStyle: menuChildrenStyle,
+          menuOptionsStyle: menuOptionsStyle,
+          menuOptionsButtonStyle: menuOptionsButtonStyle,
           menuAnchorChildBuilder: menuAnchorChildBuilder,
           menuOptions: menuOptions,
         ));
@@ -245,6 +270,10 @@ class PlutoRow {
       cells: cells,
       type: type,
       menuChildren: menuChildren,
+      menuChildrenSpacing: menuChildrenSpacing,
+      menuChildrenStyle: menuChildrenStyle,
+      menuOptionsStyle: menuOptionsStyle,
+      menuOptionsButtonStyle: menuOptionsButtonStyle,
       menuAnchorChildBuilder: menuAnchorChildBuilder,
       menuOptions: menuOptions,
     );

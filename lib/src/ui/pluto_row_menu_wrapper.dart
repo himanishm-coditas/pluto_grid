@@ -7,17 +7,26 @@ class PlutoRowMenuWrapper extends StatefulWidget {
   final Widget dragTarget;
   final Offset menuOffset;
   final List<Widget>? menuChildren;
+  final double? menuChildrenSpacing;
+  final MenuStyle? menuChildrenStyle;
+  final MenuStyle? menuOptionsStyle;
+  final ButtonStyle? menuOptionsButtonStyle;
   final List<Widget>? menuOptions;
+  final Icon? menuOptionsIcon;
 
-  const PlutoRowMenuWrapper({
-    super.key,
-    required this.row,
-    required this.stateManager,
-    required this.dragTarget,
-    required this.menuOffset,
-    this.menuChildren,
-    this.menuOptions,
-  });
+  const PlutoRowMenuWrapper(
+      {super.key,
+      required this.row,
+      required this.stateManager,
+      required this.dragTarget,
+      required this.menuOffset,
+      this.menuChildren,
+      this.menuChildrenSpacing,
+      this.menuChildrenStyle,
+      this.menuOptions,
+      this.menuOptionsStyle,
+      this.menuOptionsButtonStyle,
+      this.menuOptionsIcon});
 
   @override
   State<PlutoRowMenuWrapper> createState() => _PlutoRowMenuWrapperState();
@@ -46,7 +55,6 @@ class _PlutoRowMenuWrapperState extends State<PlutoRowMenuWrapper> {
   void _handleRowHoverChange() {
     if (_isDisposed || !mounted || widget.stateManager.isDraggingRow) return;
 
-
     final isHovered = widget.stateManager.isRowHovered(widget.row);
 
     if (!isHovered) {
@@ -58,74 +66,72 @@ class _PlutoRowMenuWrapperState extends State<PlutoRowMenuWrapper> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MenuAnchor(
-      controller: _menuController,
-      alignmentOffset: widget.menuOffset,
-      onOpen: () => _isInteractingWithMenu = true,
-      onClose: () {
-        _isInteractingWithMenu = false;
-        if (!widget.stateManager.isRowHovered(widget.row)) {
-          widget.stateManager.clearHoveredRow();
-        }
-      },
-      menuChildren: [
-        MouseRegion(
-          onEnter: (_) {
+  Widget build(BuildContext context) => MenuAnchor(
+        style: widget.menuChildrenStyle,
+        controller: _menuController,
+        alignmentOffset: widget.menuOffset,
+        onOpen: () => _isInteractingWithMenu = true,
+        onClose: () {
+          _isInteractingWithMenu = false;
+          if (!widget.stateManager.isRowHovered(widget.row)) {
             widget.stateManager.clearHoveredRow();
-            widget.stateManager.setHoveredRow(widget.row);
-          },
-          onExit: (_) {
-            if (!_isInteractingWithMenu) {
+          }
+        },
+        menuChildren: [
+          MouseRegion(
+            onEnter: (final _) {
               widget.stateManager.clearHoveredRow();
-            }
-          },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (widget.menuChildren?.isNotEmpty ?? false)
-                ...widget.menuChildren!.map(
-                      (menuItem) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: menuItem,
+              widget.stateManager.setHoveredRow(widget.row);
+            },
+            onExit: (final _) {
+              if (!_isInteractingWithMenu) {
+                widget.stateManager.clearHoveredRow();
+              }
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: widget.menuChildrenSpacing ?? 0.0,
+              children: [
+                if (widget.menuChildren?.isNotEmpty ?? false)
+                  ...widget.menuChildren!.map(
+                    (final menuItem) => menuItem,
                   ),
-                ),
-              if (widget.menuOptions?.isNotEmpty ?? false)
-                MenuAnchor(
-                  controller: _optionsMenuController,
-                  crossAxisUnconstrained: false,
-                  onOpen: () {
-                    _isInteractingWithMenu = true;
-                    if (!_menuController.isOpen) {
-                      _menuController.open();
-                    }
-                  },
-                  onClose: () {
-                    _isInteractingWithMenu = false;
-                    if (!widget.stateManager.isRowHovered(widget.row)) {
-                      widget.stateManager.clearHoveredRow();
-                    }
-                  },
-                  menuChildren: widget.menuOptions!,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: InkWell(
-                      onTap: () {
+                if (widget.menuOptions?.isNotEmpty ?? false)
+                  MenuAnchor(
+                    style: widget.menuOptionsStyle,
+                    controller: _optionsMenuController,
+                    crossAxisUnconstrained: false,
+                    onOpen: () {
+                      _isInteractingWithMenu = true;
+                      if (!_menuController.isOpen) {
+                        _menuController.open();
+                      }
+                    },
+                    onClose: () {
+                      _isInteractingWithMenu = false;
+                      if (!widget.stateManager.isRowHovered(widget.row)) {
+                        widget.stateManager.clearHoveredRow();
+                      }
+                    },
+                    menuChildren: widget.menuOptions!,
+                    child: IconButton(
+                      onPressed: () {
                         if (_optionsMenuController.isOpen) {
                           _optionsMenuController.close();
                         } else {
                           _optionsMenuController.open();
                         }
                       },
-                      child: const Icon(Icons.more_vert),
+                      style: widget.menuOptionsButtonStyle ??
+                          IconButton.styleFrom(padding: EdgeInsets.zero),
+                      icon:
+                          widget.menuOptionsIcon ?? const Icon(Icons.more_vert),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
-      child: widget.dragTarget,
-    );
-  }
+        ],
+        child: widget.dragTarget, // This will remain transparent
+      );
 }

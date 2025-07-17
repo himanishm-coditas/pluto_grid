@@ -275,10 +275,17 @@ class _WatchlistGrid extends StatelessWidget {
     return items
         .map(
           (final WatchlistItemEntity item) => PlutoRow(
+            menuChildrenStyle: const MenuStyle(
+              backgroundColor: WidgetStatePropertyAll<Color>(Colors.transparent),
+                  shadowColor: WidgetStatePropertyAll<Color>(Colors.transparent),
+            ),
             menuChildren: <Widget>[
-              const IconButton(
-                onPressed: null,
-                icon: Icon(
+              TextButton(
+                onPressed: (){},
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.green
+                ,),
+                child: const Icon(
                   Icons.add,
                   color: AppColors.errorColor,
                 ),
@@ -330,7 +337,7 @@ class _WatchlistGrid extends StatelessWidget {
                 cellColor: cellBg,
                 widget: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
+                  children: <Widget>[
                     Text(
                       item.change ?? "",
                       textAlign: TextAlign.right,

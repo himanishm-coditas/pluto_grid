@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
         builder:
             (final BuildContext context, final ThemeMode themeMode, final _) =>
                 MaterialApp(
+
           title: 'Stock Watchlist',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

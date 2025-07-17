@@ -143,6 +143,10 @@ class PlutoBaseCell extends StatelessWidget
         ),
         menuChildren: row.menuChildren,
         menuOptions: row.menuOptions,
+        menuChildrenStyle: row.menuChildrenStyle,
+        menuChildrenSpacing: row.menuChildrenSpacing,
+        menuOptionsStyle: row.menuOptionsStyle,
+        menuOptionsButtonStyle: row.menuOptionsButtonStyle,
       );
     }
 

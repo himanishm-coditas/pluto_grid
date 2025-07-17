@@ -164,7 +164,7 @@ class _PlutoDefaultCellState extends PlutoStateWithChange<PlutoDefaultCell> {
     }
 
     return Row(children: [
-      if (_canRowDrag)
+      if (_canRowDrag && widget.stateManager.isRowHovered(widget.row))
         _RowDragIconWidget(
           column: widget.column,
           row: widget.row,
